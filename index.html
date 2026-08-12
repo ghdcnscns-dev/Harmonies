@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>하모니즈 그룹별 점수 계산기</title>
+    <title>하모니즈 점수 계산기 (확장판)</title>
     <style>
         :root {
             --bg-color: #fdfaf0;
@@ -12,69 +12,205 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); padding: 20px; display: flex; flex-direction: column; align-items: center; color: var(--text-color); }
         .container { background: var(--container-bg); padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; border: 2px solid #eaddc7; }
-        h2 { text-align: center; color: var(--accent-green); }
-        .group-section { border: 2px solid #eaddc7; padding: 15px; margin-bottom: 20px; border-radius: 15px; background: #fffcf5; }
-        .player-card { border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 8px; background: #fffdfa; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
-        input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
-        .score-input { width: 45px; text-align: center; }
-        button { cursor: pointer; padding: 5px 10px; border: none; border-radius: 4px; background: var(--accent-green); color: white; margin-top: 5px; }
-        .del-btn { background: #d9534f; width: 30px; }
+        h2 { text-align: center; color: var(--accent-green); margin-bottom: 10px; }
+        .top-btns { display: flex; gap: 10px; margin-bottom: 20px; }
+        .top-btns button { flex: 1; margin-top: 0; background-color: var(--accent-green); }
+        .top-btns .reset-btn { background-color: #d9534f; }
+        
+        .category-section { border: 2px solid #eaddc7; padding: 15px; margin-bottom: 20px; border-radius: 15px; background: #fffcf5; }
+        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .category-header h3 { margin: 0; color: var(--accent-green); font-size: 1.1em; }
+        .tip { font-size: 0.8em; color: #888; background: #f0f4ed; padding: 3px 8px; border-radius: 5px; }
+        
+        .player-row { border: 1px solid #ddd; padding: 8px 12px; margin: 5px 0; border-radius: 8px; background: #fffdfa; display: flex; justify-content: space-between; align-items: center; }
+        input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        .name-input { flex: 1; margin-right: 10px; }
+        .score-input { width: 70px; text-align: center; }
+        
+        button { cursor: pointer; padding: 8px 12px; border: none; border-radius: 4px; background: var(--accent-green); color: white; width: 100%; margin-top: 10px; font-weight: bold; }
+        .del-btn { background: #d9534f; width: auto; padding: 5px 8px; margin-left: 10px; }
+        
+        .footer { margin-top: 20px; font-size: 0.8em; color: #888; text-align: center; }
+        .total-section { margin-top: 20px; padding: 15px; background: #f0f4ed; border-radius: 10px; text-align: center; font-weight: bold; }
+        .rank-item { display: flex; justify-content: space-between; padding: 5px 10px; border-bottom: 1px dashed #ddd; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>하모니즈 그룹별 계산기</h2>
-    <div id="groups"></div>
-    <button onclick="addGroup()">+ 새 그룹 추가</button>
+    <h2>하모니즈 점수 계산기</h2>
+    
+    <div class="top-btns">
+        <button onclick="addPlayer()">+ 통합 플레이어 추가</button>
+        <button class="reset-btn" onclick="resetData()">전체 초기화</button>
+    </div>
+
+    <div id="categoriesContainer">
+        <!-- 나무 그룹 -->
+        <div class="category-section" data-cat="tree">
+            <div class="category-header">
+                <h3>🌲 나무 그룹</h3>
+                <span class="tip">숲을 이루어 배치</span>
+            </div>
+            <div class="player-list"></div>
+        </div>
+        <!-- 산 그룹 -->
+        <div class="category-section" data-cat="mountain">
+            <div class="category-header">
+                <h3>⛰️ 산 그룹</h3>
+                <span class="tip">높이와 능선 연결</span>
+            </div>
+            <div class="player-list"></div>
+        </div>
+        <!-- 들판 그룹 -->
+        <div class="category-section" data-cat="field">
+            <div class="category-header">
+                <h3>🌾 들판 그룹</h3>
+                <span class="tip">인접한 들판 확장</span>
+            </div>
+            <div class="player-list"></div>
+        </div>
+        <!-- 물 그룹 -->
+        <div class="category-section" data-cat="water">
+            <div class="category-header">
+                <h3>💧 물 그룹</h3>
+                <span class="tip">강줄기 형태 연결</span>
+            </div>
+            <div class="player-list"></div>
+        </div>
+        <!-- 동물 그룹 -->
+        <div class="category-section" data-cat="animal">
+            <div class="category-header">
+                <h3>🐾 동물 그룹</h3>
+                <span class="tip">카드 조건에 맞추기</span>
+            </div>
+            <div class="player-list"></div>
+        </div>
+        <!-- 정령(확장) 그룹 -->
+        <div class="category-section" data-cat="spirit">
+            <div class="category-header">
+                <h3>✨ 정령(확장) 그룹</h3>
+                <span class="tip">확장 규칙 득점</span>
+            </div>
+            <div class="player-list"></div>
+        </div>
+    </div>
+
+    <button onclick="calculateResults()">결과 및 순위 보기</button>
+    <div id="totalResults" class="total-section" style="display:none;"></div>
 </div>
+<div class="footer">제작자: 천상민</div>
 
 <script>
-    let groups = [];
-    
-    function addGroup() {
-        let gid = Date.now();
-        groups.push({gid: gid, name: "그룹 " + (groups.length + 1), players: []});
-        render();
+    let players = [];
+    const categories = ['tree', 'mountain', 'field', 'water', 'animal', 'spirit'];
+
+    // 페이지 로드 시 저장된 데이터 불러오기
+    window.onload = function() {
+        let savedData = localStorage.getItem('harmonies_players');
+        if (savedData) {
+            try {
+                players = JSON.parse(savedData);
+                render();
+            } catch(e) {
+                players = [];
+            }
+        }
+    };
+
+    function saveData() {
+        // 점수 입력값도 임시 객체 형태로 함께 보존하기 위해 현재 입력 상태 반영
+        localStorage.setItem('harmonies_players', JSON.stringify(players));
     }
-    
-    function addPlayer(gid) {
-        let group = groups.find(g => g.gid === gid);
-        group.players.push({pid: Date.now(), name: "플레이어 " + (group.players.length + 1)});
+
+    function addPlayer() {
+        let pid = Date.now();
+        let defaultName = "플레이어 " + (players.length + 1);
+        players.push({ pid: pid, name: defaultName, scores: { tree: '', mountain: '', field: '', water: '', animal: '', spirit: '' } });
         render();
+        saveData();
     }
-    
-    function removePlayer(gid, pid) {
-        let group = groups.find(g => g.gid === gid);
-        group.players = group.players.filter(p => p.pid !== pid);
+
+    function removePlayer(pid) {
+        players = players.filter(p => p.pid !== pid);
         render();
+        saveData();
     }
-    
+
+    function updatePlayerName(pid, newName) {
+        let player = players.find(p => p.pid === pid);
+        if (player) {
+            player.name = newName;
+            document.querySelectorAll(`.name-input-${pid}`).forEach(input => {
+                if (input.value !== newName) {
+                    input.value = newName;
+                }
+            });
+            saveData();
+        }
+    }
+
+    function updateScore(pid, cat, val) {
+        let player = players.find(p => p.pid === pid);
+        if (player) {
+            player.scores[cat] = val;
+            saveData();
+        }
+    }
+
+    function resetData() {
+        if (confirm("모든 플레이어와 점수 기록을 초기화하시겠습니까?")) {
+            players = [];
+            localStorage.removeItem('harmonies_players');
+            render();
+            document.getElementById('totalResults').style.display = "none";
+        }
+    }
+
     function render() {
-        let html = "";
-        groups.forEach(g => {
-            html += `<div class="group-section">
-                <h3><input type="text" value="${g.name}" onchange="updateGroupName(${g.gid}, this.value)"></h3>
-                <div id="players-${g.gid}">`;
-            g.players.forEach(p => {
-                html += `<div class="player-card">
-                    <input type="text" value="${p.name}" onchange="updatePlayerName(${g.gid}, ${p.pid}, this.value)">
-                    <input type="number" placeholder="나무" class="score-input" id="tree-${p.pid}">
-                    <input type="number" placeholder="산" class="score-input" id="mountain-${p.pid}">
-                    <input type="number" placeholder="들판" class="score-input" id="field-${p.pid}">
-                    <input type="number" placeholder="물" class="score-input" id="water-${p.pid}">
-                    <input type="number" placeholder="동물" class="score-input" id="animal-${p.pid}">
-                    <input type="number" placeholder="정령" class="score-input" id="spirit-${p.pid}">
-                    <button class="del-btn" onclick="removePlayer(${g.gid}, ${p.pid})">X</button>
+        categories.forEach(cat => {
+            let section = document.querySelector(`[data-cat="${cat}"] .player-list`);
+            let html = "";
+            players.forEach(p => {
+                let currentVal = p.scores[cat] !== undefined ? p.scores[cat] : '';
+                html += `<div class="player-row">
+                    <input type="text" class="name-input name-input-${p.pid}" value="${p.name}" oninput="updatePlayerName(${p.pid}, this.value)">
+                    <input type="number" class="score-input" placeholder="점수" value="${currentVal}" oninput="updateScore(${p.pid}, '${cat}', this.value)">
+                    <button class="del-btn" onclick="removePlayer(${p.pid})">삭제</button>
                 </div>`;
             });
-            html += `</div><button onclick="addPlayer(${g.gid})">+ 플레이어 추가</button></div>`;
+            section.innerHTML = html;
         });
-        document.getElementById('groups').innerHTML = html;
     }
-    
-    function updateGroupName(gid, val) { groups.find(g => g.gid === gid).name = val; }
-    function updatePlayerName(gid, pid, val) { groups.find(g => g.gid === gid).players.find(p => p.pid === pid).name = val; }
+
+    function calculateResults() {
+        let results = players.map(p => {
+            let totalScore = 0;
+            categories.forEach(cat => {
+                let val = parseInt(p.scores[cat]) || 0;
+                totalScore += val;
+            });
+            return { name: p.name, score: totalScore };
+        }).sort((a, b) => b.score - a.score);
+
+        let resDiv = document.getElementById('totalResults');
+        resDiv.style.display = "block";
+        
+        let html = "<h3>🏆 최종 순위</h3>";
+        if (results.length === 0) {
+            html += "<p>등록된 플레이어가 없습니다.</p>";
+        } else {
+            let currentRank = 1;
+            results.forEach((r, idx) => {
+                // 공동 순위 처리 (이전 사람과 점수가 같으면 같은 등수 부여)
+                if (idx > 0 && results[idx - 1].score !== r.score) {
+                    currentRank = idx + 1;
+                }
+                html += `<div class="rank-item"><span>${currentRank}등: ${r.name}</span> <span>${r.score}점</span></div>`;
+            });
+        }
+        resDiv.innerHTML = html;
+    }
 </script>
 </body>
 </html>
