@@ -374,7 +374,7 @@
         if (player) {
             player.scores.waterMode = mode;
             saveData();
-            render(); // 모드 변경에 따라 입력 필드 UI가 바뀌므로 렌더링 갱신
+            render(); 
         }
     }
 
@@ -461,7 +461,6 @@
     }
 
     function render() {
-        // 1. 플레이어 태그 목록 렌더링
         let tagContainer = document.getElementById('playerTagList');
         if (players.length === 0) {
             tagContainer.innerHTML = `<div class="empty-notice" style="width:100%;">등록된 플레이어가 없습니다. 위에서 이름을 추가해주세요.</div>`;
@@ -473,7 +472,6 @@
             tagContainer.innerHTML = tagHtml;
         }
 
-        // 2. 그룹(카테고리)별 점수판 렌더링
         let catContainer = document.getElementById('categoriesContainer');
         let catHtml = "";
 
@@ -513,7 +511,6 @@
                         </div>
                     `;
 
-                    // 그룹별 맞춤 입력 폼
                     if (cat.key === 'tree' || cat.key === 'mountain') {
                         let t = p.scores[cat.key];
                         catHtml += `
@@ -596,7 +593,7 @@
                         `;
                     }
 
-                    catHtml += `</div>`; // player-card 닫기
+                    catHtml += `</div>`;
                 });
             }
 
