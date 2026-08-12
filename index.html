@@ -2,108 +2,79 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>하모니즈 점수 계산기</title>
+    <title>하모니즈 그룹별 점수 계산기</title>
     <style>
-        /* 하모니즈 테마 색상 적용 */
         :root {
-            --bg-color: #fdfaf0;     /* 따뜻한 미색 배경 */
-            --container-bg: #fffcf5; /* 카드 배경 */
-            --accent-green: #7da56e; /* 자연 녹색 */
-            --accent-blue: #6d9dbf;  /* 물/강 파란색 */
-            --accent-brown: #a68a73; /* 나무/산 갈색 */
-            --text-color: #5a4e44;   /* 부드러운 텍스트 */
+            --bg-color: #fdfaf0;
+            --container-bg: #fffcf5;
+            --accent-green: #7da56e;
+            --text-color: #5a4e44;
         }
-
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: var(--bg-color); 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-color);
-        }
-
-        .container { 
-            background: var(--container-bg); 
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
-            width: 450px; 
-            border: 2px solid #eaddc7;
-        }
-
-        h2 { text-align: center; color: var(--accent-green); margin-bottom: 25px; }
-
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input { 
-            width: 100%; padding: 10px; box-sizing: border-box; 
-            border: 2px solid #eaddc7; border-radius: 10px; background: #fffdfa;
-        }
-
-        button { 
-            width: 100%; background-color: var(--accent-green); color: white; 
-            border: none; padding: 12px; border-radius: 10px; font-size: 16px; 
-            cursor: pointer; margin-top: 10px; transition: 0.3s;
-        }
-        button:hover { background-color: #6a8e5d; }
-
-        .result { 
-            margin-top: 25px; padding: 20px; background-color: #f0f4ed; 
-            border-radius: 15px; text-align: center; font-size: 20px; 
-            font-weight: bold; color: var(--accent-green);
-        }
-
-        .footer {
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #888;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); padding: 20px; display: flex; flex-direction: column; align-items: center; color: var(--text-color); }
+        .container { background: var(--container-bg); padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; border: 2px solid #eaddc7; }
+        h2 { text-align: center; color: var(--accent-green); }
+        .group-section { border: 2px solid #eaddc7; padding: 15px; margin-bottom: 20px; border-radius: 15px; background: #fffcf5; }
+        .player-card { border: 1px solid #ddd; padding: 10px; margin: 5px 0; border-radius: 8px; background: #fffdfa; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+        input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
+        .score-input { width: 45px; text-align: center; }
+        button { cursor: pointer; padding: 5px 10px; border: none; border-radius: 4px; background: var(--accent-green); color: white; margin-top: 5px; }
+        .del-btn { background: #d9534f; width: 30px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>하모니즈 점수 계산기</h2>
-    <div class="input-group">
-        <label>나무 점수:</label>
-        <input type="number" id="tree" value="0">
-    </div>
-    <div class="input-group">
-        <label>산 점수:</label>
-        <input type="number" id="mountain" value="0">
-    </div>
-    <div class="input-group">
-        <label>들판 점수:</label>
-        <input type="number" id="field" value="0">
-    </div>
-    <div class="input-group">
-        <label>물 점수:</label>
-        <input type="number" id="water" value="0">
-    </div>
-    <div class="input-group">
-        <label>동물 카드 점수:</label>
-        <input type="number" id="animal" value="0">
-    </div>
-    <button onclick="calc()">점수 합산하기</button>
-    <div class="result" id="res">총 점수: 0점</div>
-</div>
-
-<div class="footer">
-    제작자: 천상민
+    <h2>하모니즈 그룹별 계산기</h2>
+    <div id="groups"></div>
+    <button onclick="addGroup()">+ 새 그룹 추가</button>
 </div>
 
 <script>
-    function calc() {
-        let total = 0;
-        ['tree', 'mountain', 'field', 'water', 'animal'].forEach(id => {
-            total += parseInt(document.getElementById(id).value) || 0;
-        });
-        document.getElementById('res').innerText = "총 점수: " + total + "점";
+    let groups = [];
+    
+    function addGroup() {
+        let gid = Date.now();
+        groups.push({gid: gid, name: "그룹 " + (groups.length + 1), players: []});
+        render();
     }
+    
+    function addPlayer(gid) {
+        let group = groups.find(g => g.gid === gid);
+        group.players.push({pid: Date.now(), name: "플레이어 " + (group.players.length + 1)});
+        render();
+    }
+    
+    function removePlayer(gid, pid) {
+        let group = groups.find(g => g.gid === gid);
+        group.players = group.players.filter(p => p.pid !== pid);
+        render();
+    }
+    
+    function render() {
+        let html = "";
+        groups.forEach(g => {
+            html += `<div class="group-section">
+                <h3><input type="text" value="${g.name}" onchange="updateGroupName(${g.gid}, this.value)"></h3>
+                <div id="players-${g.gid}">`;
+            g.players.forEach(p => {
+                html += `<div class="player-card">
+                    <input type="text" value="${p.name}" onchange="updatePlayerName(${g.gid}, ${p.pid}, this.value)">
+                    <input type="number" placeholder="나무" class="score-input" id="tree-${p.pid}">
+                    <input type="number" placeholder="산" class="score-input" id="mountain-${p.pid}">
+                    <input type="number" placeholder="들판" class="score-input" id="field-${p.pid}">
+                    <input type="number" placeholder="물" class="score-input" id="water-${p.pid}">
+                    <input type="number" placeholder="동물" class="score-input" id="animal-${p.pid}">
+                    <input type="number" placeholder="정령" class="score-input" id="spirit-${p.pid}">
+                    <button class="del-btn" onclick="removePlayer(${g.gid}, ${p.pid})">X</button>
+                </div>`;
+            });
+            html += `</div><button onclick="addPlayer(${g.gid})">+ 플레이어 추가</button></div>`;
+        });
+        document.getElementById('groups').innerHTML = html;
+    }
+    
+    function updateGroupName(gid, val) { groups.find(g => g.gid === gid).name = val; }
+    function updatePlayerName(gid, pid, val) { groups.find(g => g.gid === gid).players.find(p => p.pid === pid).name = val; }
 </script>
-
 </body>
-</html
+</html>
