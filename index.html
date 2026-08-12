@@ -59,46 +59,110 @@
             background: #fffcf5; 
         }
         .category-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
             margin-bottom: 10px; 
             padding-bottom: 6px;
             border-bottom: 1px dashed var(--border-color);
         }
-        .category-header h3 { margin: 0; color: var(--accent-green-dark); font-size: 1.05em; }
-        .tip { font-size: 0.75em; color: #777; background: #f0f4ed; padding: 3px 6px; border-radius: 6px; }
-        
-        /* 그룹 내 플레이어 점수 입력 행 */
-        .player-row { 
-            background: #fffdfa; 
+        .category-header-top {
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 6px 8px;
-            margin-bottom: 6px;
-            border: 1px solid #eee;
-            border-radius: 8px;
         }
-        .player-name-label {
-            flex: 1;
+        .category-header h3 { margin: 0; color: var(--accent-green-dark); font-size: 1.05em; }
+        .tip { font-size: 0.75em; color: #777; background: #f0f4ed; padding: 3px 6px; border-radius: 6px; }
+        
+        .sub-tip {
+            font-size: 0.78em;
+            color: #666;
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        /* 플레이어별 상세 입력 카드 */
+        .player-card {
+            background: #fffdfa;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+        .player-card-header {
             font-size: 0.95em;
-            font-weight: 600;
-            color: var(--text-color);
-            padding-left: 4px;
+            font-weight: bold;
+            color: var(--accent-green-dark);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .calc-preview {
+            font-size: 0.85em;
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        /* 입력 그리드 구조 */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+        .input-grid.cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        .input-group {
+            background: #fff;
+            border: 1px solid #eaddc7;
+            border-radius: 8px;
+            padding: 6px;
+            text-align: center;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.75em;
+            color: #777;
+            margin-bottom: 3px;
         }
         .score-input { 
-            width: 75px; 
-            padding: 8px; 
+            width: 100%; 
+            padding: 6px; 
             text-align: center; 
             border: 1px solid #ccc; 
-            border-radius: 8px; 
-            font-size: 1.05em;
+            border-radius: 6px; 
+            font-size: 1em;
             font-weight: bold;
             background: #fff;
         }
 
-        /* 플레이어 관리 영역 (이름 추가/삭제) */
+        /* 라디오 셀렉터 (물 그룹 A/B 선택용) */
+        .mode-selector {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .mode-selector label {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 0.85em;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .mode-selector input {
+            display: none;
+        }
+        .mode-selector input:checked + span {
+            color: var(--accent-green-dark);
+        }
+        .mode-selector label.active {
+            background: #f0f4ed;
+            border-color: var(--accent-green);
+        }
+
+        /* 플레이어 관리 영역 */
         .manage-section {
             border: 2px dashed var(--border-color);
             padding: 12px;
@@ -229,17 +293,16 @@
     let players = [];
     
     const categories = [
-        { key: 'tree', name: '🌲 나무 그룹', tip: '높이에 따른 점수' },
-        { key: 'mountain', name: '⛰️ 산 그룹', tip: '인접 산 높이 점수' },
-        { key: 'field', name: '🌾 들판 그룹', tip: '노랑토큰 2개이상 (곳당 5점)' },
-        { key: 'water', name: '💧 물 그룹', tip: 'A강길 / B섬 점수' },
-        { key: 'building', name: '🏠 건물 그룹', tip: '각 건물당 5점' },
-        { key: 'animal', name: '🐾 동물 그룹', tip: '카드 조건 맞춤 점수' },
-        { key: 'spirit', name: '✨ 정령(확장) 그룹', tip: '확장 규칙 점수' }
+        { key: 'tree', name: '🌲 나무 그룹', tip: '층별 개수 입력' },
+        { key: 'mountain', name: '⛰️ 산 그룹', tip: '층별 개수 입력' },
+        { key: 'field', name: '🌾 들판 그룹', tip: '노랑토큰 2개 이상 (곳당 5점)' },
+        { key: 'water', name: '💧 물 그룹', tip: 'A강길 / B섬 선택 입력' },
+        { key: 'building', name: '🏠 건물 그룹', tip: '건물당 5점' },
+        { key: 'animal', name: '🐾 동물 그룹', tip: '카드 조건 점수 직접 입력' }
     ];
 
     window.onload = function() {
-        let savedData = localStorage.getItem('harmonies_group_calc');
+        let savedData = localStorage.getItem('harmonies_rule_calc');
         if (savedData) {
             try {
                 players = JSON.parse(savedData);
@@ -253,7 +316,7 @@
     };
 
     function saveData() {
-        localStorage.setItem('harmonies_group_calc', JSON.stringify(players));
+        localStorage.setItem('harmonies_rule_calc', JSON.stringify(players));
     }
 
     function addPlayer() {
@@ -264,8 +327,16 @@
         }
         
         let pid = Date.now() + Math.random();
-        let initialScores = {};
-        categories.forEach(cat => { initialScores[cat.key] = ''; });
+        let initialScores = {
+            tree: { f0: '', f1: '', f2: '', f3: '' },
+            mountain: { f0: '', f1: '', f2: '', f3: '' },
+            field: '',
+            waterMode: 'A',
+            waterLines: '',
+            waterIsland: '',
+            building: '',
+            animal: ''
+        };
         
         players.push({ pid: pid, name: name, scores: initialScores });
         input.value = '';
@@ -280,18 +351,104 @@
         document.getElementById('totalResults').style.display = "none";
     }
 
-    function updateScore(pid, catKey, val) {
+    function updateSubScore(pid, catKey, subKey, val) {
+        let player = players.find(p => p.pid === pid);
+        if (player) {
+            player.scores[catKey][subKey] = val;
+            saveData();
+            updatePreview(pid);
+        }
+    }
+
+    function updateDirectScore(pid, catKey, val) {
         let player = players.find(p => p.pid === pid);
         if (player) {
             player.scores[catKey] = val;
             saveData();
+            updatePreview(pid);
+        }
+    }
+
+    function updateWaterMode(pid, mode) {
+        let player = players.find(p => p.pid === pid);
+        if (player) {
+            player.scores.waterMode = mode;
+            saveData();
+            render(); // 모드 변경에 따라 입력 필드 UI가 바뀌므로 렌더링 갱신
+        }
+    }
+
+    // 개별 점수 계산 로직 함수들
+    function calculatePlayerScore(p) {
+        let s = p.scores;
+        let total = 0;
+
+        // 1. 나무 그룹 (0층:0점, 1층:1점, 2층:3점, 3층:7점)
+        if (s.tree) {
+            let t0 = parseInt(s.tree.f0) || 0;
+            let t1 = parseInt(s.tree.f1) || 0;
+            let t2 = parseInt(s.tree.f2) || 0;
+            let t3 = parseInt(s.tree.f3) || 0;
+            total += (t0 * 0) + (t1 * 1) + (t2 * 3) + (t3 * 7);
+        }
+
+        // 2. 산 그룹 (0층:0점, 1층:1점, 2층:3점, 3층:7점)
+        if (s.mountain) {
+            let m0 = parseInt(s.mountain.f0) || 0;
+            let m1 = parseInt(s.mountain.f1) || 0;
+            let m2 = parseInt(s.mountain.f2) || 0;
+            let m3 = parseInt(s.mountain.f3) || 0;
+            total += (m0 * 0) + (m1 * 1) + (m2 * 3) + (m3 * 7);
+        }
+
+        // 3. 들판 그룹 (1개당 5점)
+        total += (parseInt(s.field) || 0) * 5;
+
+        // 4. 물 그룹
+        if (s.waterMode === 'A') {
+            // A강길 규칙: 1줄당 0점, 2줄당 2점, 3줄당 5점, 4줄당 8점, 5줄당 11점, 6줄당 15점, 7줄 이상은 15점 + 줄당 +4점
+            let lines = parseInt(s.waterLines) || 0;
+            let wScore = 0;
+            if (lines === 1) wScore = 0;
+            else if (lines === 2) wScore = 2;
+            else if (lines === 3) wScore = 5;
+            else if (lines === 4) wScore = 8;
+            else if (lines === 5) wScore = 11;
+            else if (lines === 6) wScore = 15;
+            else if (lines >= 7) {
+                wScore = 15 + (lines - 6) * 4;
+            }
+            total += wScore;
+        } else {
+            // B섬 규칙: 1개의 섬 1개당 5점
+            let island = parseInt(s.waterIsland) || 0;
+            total += island * 5;
+        }
+
+        // 5. 건물 그룹 (1개의 건물마다 5점)
+        total += (parseInt(s.building) || 0) * 5;
+
+        // 6. 동물 카드 점수 (직접 입력)
+        total += (parseInt(s.animal) || 0);
+
+        return total;
+    }
+
+    function updatePreview(pid) {
+        let player = players.find(p => p.pid === pid);
+        if (player) {
+            let score = calculatePlayerScore(player);
+            let prevEl = document.getElementById('preview-' + pid);
+            if (prevEl) {
+                prevEl.innerText = `현재 합계: ${score}점`;
+            }
         }
     }
 
     function resetData() {
         if (confirm("모든 플레이어와 점수 기록을 초기화하시겠습니까?")) {
             players = [];
-            localStorage.removeItem('harmonies_group_calc');
+            localStorage.removeItem('harmonies_rule_calc');
             render();
             document.getElementById('totalResults').style.display = "none";
         }
@@ -318,23 +475,122 @@
             catHtml += `
             <div class="category-section">
                 <div class="category-header">
-                    <h3>${cat.name}</h3>
-                    <span class="tip">${cat.tip}</span>
+                    <div class="category-header-top">
+                        <h3>${cat.name}</h3>
+                        <span class="tip">${cat.tip}</span>
+                    </div>
+            `;
+            
+            if (cat.key === 'tree') {
+                catHtml += `<div class="sub-tip">규칙: 0층(0점) / 1층(1점) / 2층(3점) / 3층(7점)</div>`;
+            } else if (cat.key === 'mountain') {
+                catHtml += `<div class="sub-tip">규칙: 0층(0점) / 1층(1점) / 2층(3점) / 3층(7점)</div>`;
+            } else if (cat.key === 'water') {
+                catHtml += `<div class="sub-tip">규칙: A(줄별 차등+초과시+4점) / B(섬당 5점)</div>`;
+            }
+
+            catHtml += `
                 </div>
-                <div class="category-player-list">
+                <div class="category-player-content">
             `;
 
             if (players.length === 0) {
                 catHtml += `<div class="empty-notice">플레이어를 먼저 추가해주세요.</div>`;
             } else {
                 players.forEach(p => {
-                    let currentVal = (p.scores && p.scores[cat.key] !== undefined) ? p.scores[cat.key] : '';
+                    let currentScore = calculatePlayerScore(p);
                     catHtml += `
-                    <div class="player-row">
-                        <span class="player-name-label">${p.name}</span>
-                        <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${currentVal}" oninput="updateScore(${p.pid}, '${cat.key}', this.value)">
-                    </div>
+                    <div class="player-card">
+                        <div class="player-card-header">
+                            <span>👤 ${p.name}</span>
+                            <span class="calc-preview" id="preview-${p.pid}">현재 합계: ${currentScore}점</span>
+                        </div>
                     `;
+
+                    // 그룹별 맞춤 입력 폼
+                    if (cat.key === 'tree' || cat.key === 'mountain') {
+                        let t = p.scores[cat.key];
+                        catHtml += `
+                        <div class="input-grid cols-4">
+                            <div class="input-group">
+                                <label>0층(0점)</label>
+                                <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${t.f0}" oninput="updateSubScore(${p.pid}, '${cat.key}', 'f0', this.value)">
+                            </div>
+                            <div class="input-group">
+                                <label>1층(1점)</label>
+                                <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${t.f1}" oninput="updateSubScore(${p.pid}, '${cat.key}', 'f1', this.value)">
+                            </div>
+                            <div class="input-group">
+                                <label>2층(3점)</label>
+                                <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${t.f2}" oninput="updateSubScore(${p.pid}, '${cat.key}', 'f2', this.value)">
+                            </div>
+                            <div class="input-group">
+                                <label>3층(7점)</label>
+                                <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${t.f3}" oninput="updateSubScore(${p.pid}, '${cat.key}', 'f3', this.value)">
+                            </div>
+                        </div>
+                        `;
+                    } else if (cat.key === 'field') {
+                        catHtml += `
+                        <div class="input-grid">
+                            <div class="input-group" style="grid-column: span 2;">
+                                <label>노랑토큰 2개 이상 들판 개수 (곳당 5점)</label>
+                                <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.field}" oninput="updateDirectScore(${p.pid}, 'field', this.value)">
+                            </div>
+                        </div>
+                        `;
+                    } else if (cat.key === 'water') {
+                        let isA = p.scores.waterMode === 'A';
+                        catHtml += `
+                        <div class="mode-selector">
+                            <label class="${isA ? 'active' : ''}" onclick="updateWaterMode(${p.pid}, 'A')">
+                                <input type="radio" name="waterMode-${p.pid}" ${isA ? 'checked' : ''}> A (강길 점수)
+                            </label>
+                            <label class="${!isA ? 'active' : ''}" onclick="updateWaterMode(${p.pid}, 'B')">
+                                <input type="radio" name="waterMode-${p.pid}" ${!isA ? 'checked' : ''}> B (섬 점수)
+                            </label>
+                        </div>
+                        `;
+                        if (isA) {
+                            catHtml += `
+                            <div class="input-grid">
+                                <div class="input-group" style="grid-column: span 2;">
+                                    <label>완성한 강길 총 줄 수</label>
+                                    <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.waterLines}" oninput="updateDirectScore(${p.pid}, 'waterLines', this.value)">
+                                </div>
+                            </div>
+                            `;
+                        } else {
+                            catHtml += `
+                            <div class="input-grid">
+                                <div class="input-group" style="grid-column: span 2;">
+                                    <label>완성한 섬 개수 (개당 5점)</label>
+                                    <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.waterIsland}" oninput="updateDirectScore(${p.pid}, 'waterIsland', this.value)">
+                                </div>
+                            </div>
+                            `;
+                        }
+                    } else if (cat.key === 'building') {
+                        catHtml += `
+                        <div class="input-grid">
+                            <div class="input-group" style="grid-column: span 2;">
+                                <label>건물 개수 (개당 5점)</label>
+                                <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.building}" oninput="updateDirectScore(${p.pid}, 'building', this.value)">
+                            </div>
+                        </div>
+                        `;
+                    } else if (cat.key === 'animal') {
+                        catHtml += `
+                        <div class="input-grid">
+                            <div class="input-group" style="grid-column: span 2;">
+                                <label>동물 카드 총 합산 점수</label>
+                                <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.animal}" oninput="updateDirectScore(${p.pid}, 'animal', this.value)">
+                            </div>
+                        </div>
+                        `;
+                    }
+
+                    catHtml += `</div>`; // player-card 닫기
                 });
             }
 
@@ -354,12 +610,7 @@
         }
 
         let results = players.map(p => {
-            let totalScore = 0;
-            categories.forEach(cat => {
-                let val = parseInt(p.scores[cat.key]) || 0;
-                totalScore += val;
-            });
-            return { name: p.name, score: totalScore };
+            return { name: p.name, score: calculatePlayerScore(p) };
         }).sort((a, b) => b.score - a.score);
 
         let resDiv = document.getElementById('totalResults');
