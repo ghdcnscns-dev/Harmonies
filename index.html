@@ -91,14 +91,6 @@
             border-radius: 4px; color: #fff; font-size: 0.85rem;
         }
 
-        .inputs-group input[value="0"] {
-            color: transparent;
-        }
-        .inputs-group input[value="0"]::selection {
-            color: transparent;
-            background: var(--primary-color);
-        }
-
         .calc-result { font-weight: bold; color: #34d399; width: 45px; text-align: right; }
 
         .players-manage-card {
@@ -106,7 +98,7 @@
             border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px;
         }
 
-        .players-manage-header { font-size: 0.9rem; font-weight: bold; color: #94a3b8; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
+        .players-manage-header { font-size: 0.9rem; font-weight: bold; color: #94a3b8; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
 
         .player-manage-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -191,14 +183,16 @@
             `;
         });
 
-        // 인원 삭제 관리 섹션 렌더링
+        // 인원 삭제 관리 섹션 렌더링 (인원 추가 버튼 중복 제거 및 삭제 기능만 깔끔하게 배치)
         html += `
             <div class="players-manage-card">
-                <div class="players-manage-header">👤 인원 삭제 관리</div>
+                <div class="players-manage-header">
+                    <span>👤 플레이어 관리 (인원 삭제)</span>
+                </div>
                 ${players.map(player => `
                     <div class="player-manage-row">
                         <span style="font-weight: bold; font-size: 0.9rem;">${player.name}</span>
-                        ${players.length > 1 ? `<button class="delete-player" onclick="deletePlayer(${player.id})" style="background:none; color:#94a3b8; cursor:pointer;">✕ 삭제</button>` : '<span style="font-size:0.8rem; color:#94a3b8;">삭제 불가 (최소 1명)</span>'}
+                        ${players.length > 1 ? `<button class="delete-player" onclick="deletePlayer(${player.id})" style="background:none; color:#f87171; cursor:pointer; font-weight:600;">✕ 삭제</button>` : '<span style="font-size:0.8rem; color:#94a3b8;">삭제 불가 (최소 1명)</span>'}
                     </div>
                 `).join('')}
             </div>
@@ -221,11 +215,15 @@
     window.updateValue = (id, cId, v) => {
         let p = players.find(p=>p.id===id); 
         p.values[cId] = v === '' ? 0 : Number(v);
-        document.getElementById(`res-${id}-${cId}`).innerText = `${p.values[cId]}점`;
+        const resEl = document.getElementById(`res-${id}-${cId}`);
+        if(resEl) resEl.innerText = `${p.values[cId]}점`;
         renderRanking();
     };
 
-    window.deletePlayer = (id) => { players = players.filter(p=>p.id!==id); renderApp(); };
+    window.deletePlayer = (id) => { 
+        players = players.filter(p=>p.id!==id); 
+        renderApp(); 
+    };
     
     document.getElementById('add-player-btn').onclick = () => { 
         players.push({id:Date.now(), name:`플레이어 ${players.length + 1}`, values:{habitat: 0, animal: 0, spirit: 0}}); 
