@@ -287,21 +287,11 @@
         { key: 'spirit', name: '✨ 정령 카드 (확장)', tip: '카드 장당 1점' }
     ];
 
+    // 실행 시 저장 데이터를 로드하지 않고 빈 상태로 시작
     window.onload = function() {
-        let savedData = localStorage.getItem('harmonies_rule_calc');
-        if (savedData) {
-            try {
-                players = JSON.parse(savedData);
-            } catch(e) {
-                players = [];
-            }
-        }
+        players = [];
         render();
     };
-
-    function saveData() {
-        localStorage.setItem('harmonies_rule_calc', JSON.stringify(players));
-    }
 
     function addPlayer() {
         let input = document.getElementById('newPlayerName');
@@ -326,20 +316,17 @@
         players.push({ pid: pid, name: name, scores: initialScores });
         input.value = '';
         render();
-        saveData();
     }
 
     function removePlayer(pid) {
         players = players.filter(p => p.pid !== pid);
         render();
-        saveData();
     }
 
     function updateSubScore(pid, catKey, subKey, val) {
         let player = players.find(p => p.pid === pid);
         if (player) {
             player.scores[catKey][subKey] = val;
-            saveData();
             updatePreview(pid, catKey);
             updateResults();
         }
@@ -349,7 +336,6 @@
         let player = players.find(p => p.pid === pid);
         if (player) {
             player.scores[catKey] = val;
-            saveData();
             updatePreview(pid, catKey);
             updateResults();
         }
@@ -359,7 +345,6 @@
         let player = players.find(p => p.pid === pid);
         if (player) {
             player.scores.waterMode = mode;
-            saveData();
             let container = document.getElementById(`water-inputs-${pid}`);
             if (container) {
                 container.innerHTML = getWaterInputsHtml(player);
@@ -442,7 +427,6 @@
     function resetData() {
         if (confirm("모든 플레이어와 점수 기록을 초기화하시겠습니까?")) {
             players = [];
-            localStorage.removeItem('harmonies_rule_calc');
             render();
         }
     }
