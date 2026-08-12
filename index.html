@@ -2,37 +2,165 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>하모니즈 점수 계산기 (확장판)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>하모니즈 점수 계산기 (모바일 최적화판)</title>
     <style>
         :root {
             --bg-color: #fdfaf0;
             --container-bg: #fffcf5;
             --accent-green: #7da56e;
+            --accent-green-dark: #628555;
             --text-color: #5a4e44;
+            --border-color: #eaddc7;
         }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); padding: 20px; display: flex; flex-direction: column; align-items: center; color: var(--text-color); }
-        .container { background: var(--container-bg); padding: 20px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); width: 100%; max-width: 600px; border: 2px solid #eaddc7; }
-        h2 { text-align: center; color: var(--accent-green); margin-bottom: 10px; }
-        .top-btns { display: flex; gap: 10px; margin-bottom: 20px; }
-        .top-btns button { flex: 1; margin-top: 0; background-color: var(--accent-green); }
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background-color: var(--bg-color); 
+            padding: 12px; 
+            margin: 0;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            color: var(--text-color); 
+        }
+        .container { 
+            background: var(--container-bg); 
+            padding: 15px; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            width: 100%; 
+            max-width: 500px; 
+            border: 2px solid var(--border-color); 
+        }
+        h2 { text-align: center; color: var(--accent-green); margin: 5px 0 15px 0; font-size: 1.4em; }
+        
+        .top-btns { display: flex; gap: 8px; margin-bottom: 15px; }
+        .top-btns button { 
+            flex: 1; 
+            margin-top: 0; 
+            background-color: var(--accent-green); 
+            padding: 12px; 
+            font-size: 0.95em;
+            border-radius: 10px;
+        }
         .top-btns .reset-btn { background-color: #d9534f; }
         
-        .category-section { border: 2px solid #eaddc7; padding: 15px; margin-bottom: 20px; border-radius: 15px; background: #fffcf5; }
-        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .category-header h3 { margin: 0; color: var(--accent-green); font-size: 1.1em; }
-        .tip { font-size: 0.8em; color: #888; background: #f0f4ed; padding: 3px 8px; border-radius: 5px; }
-        
-        .player-row { border: 1px solid #ddd; padding: 8px 12px; margin: 5px 0; border-radius: 8px; background: #fffdfa; display: flex; justify-content: space-between; align-items: center; }
-        input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        .name-input { flex: 1; margin-right: 10px; }
-        .score-input { width: 70px; text-align: center; }
-        
-        button { cursor: pointer; padding: 8px 12px; border: none; border-radius: 4px; background: var(--accent-green); color: white; width: 100%; margin-top: 10px; font-weight: bold; }
-        .del-btn { background: #d9534f; width: auto; padding: 5px 8px; margin-left: 10px; }
-        
+        /* 탭 스타일 추가 (모바일에서 한눈에 보기 편하도록 카테고리별 전환 또는 아코디언/플레이어 중심 카드 뷰) */
+        .player-card {
+            border: 2px solid var(--border-color);
+            background: #fffdfa;
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .player-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .name-input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        .del-btn { 
+            background: #d9534f; 
+            width: auto; 
+            padding: 8px 12px; 
+            margin-top: 0;
+            border-radius: 8px;
+            font-size: 0.85em;
+        }
+
+        /* 점수 입력 그리드 레이아웃 (모바일 터치 편의성 극대화) */
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .score-item {
+            background: #f8faf5;
+            border: 1px solid #e2ebd8;
+            padding: 8px 10px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .score-item label {
+            font-size: 0.8em;
+            font-weight: bold;
+            color: var(--accent-green-dark);
+            display: flex;
+            justify-content: space-between;
+        }
+        .score-item label span {
+            font-size: 0.75em;
+            color: #888;
+            font-weight: normal;
+        }
+        .score-input {
+            width: 100%;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            background: #fff;
+        }
+
+        /* 메인 액션 버튼 */
+        .action-btn {
+            cursor: pointer; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 12px; 
+            background: var(--accent-green); 
+            color: white; 
+            width: 100%; 
+            margin-top: 10px; 
+            font-weight: bold;
+            font-size: 1.05em;
+            box-shadow: 0 3px 6px rgba(125, 165, 110, 0.3);
+        }
+        .action-btn:active { background: var(--accent-green-dark); }
+
         .footer { margin-top: 20px; font-size: 0.8em; color: #888; text-align: center; }
-        .total-section { margin-top: 20px; padding: 15px; background: #f0f4ed; border-radius: 10px; text-align: center; font-weight: bold; }
-        .rank-item { display: flex; justify-content: space-between; padding: 5px 10px; border-bottom: 1px dashed #ddd; }
+        
+        .total-section { 
+            margin-top: 20px; 
+            padding: 15px; 
+            background: #f0f4ed; 
+            border-radius: 12px; 
+            border: 1px solid #d4dec9;
+        }
+        .total-section h3 { margin-top: 0; color: var(--accent-green-dark); text-align: center; }
+        .rank-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 8px 10px; 
+            background: #fff;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .empty-notice {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -41,81 +169,35 @@
     <h2>하모니즈 점수 계산기</h2>
     
     <div class="top-btns">
-        <button onclick="addPlayer()">+ 통합 플레이어 추가</button>
+        <button onclick="addPlayer()">+ 플레이어 추가</button>
         <button class="reset-btn" onclick="resetData()">전체 초기화</button>
     </div>
 
-    <div id="categoriesContainer">
-        <!-- 나무 그룹 -->
-        <div class="category-section" data-cat="tree">
-            <div class="category-header">
-                <h3>🌲 나무 그룹</h3>
-                <span class="tip">각 나무의 높이에 따라 점수</span>
-            </div>
-            <div class="player-list"></div>
-        </div>
-        <!-- 산 그룹 -->
-        <div class="category-section" data-cat="mountain">
-            <div class="category-header">
-                <h3>⛰️ 산 그룹</h3>
-                <span class="tip">각 산 높이에 따라 점수 단,인접해야됨</span>
-            </div>
-            <div class="player-list"></div>
-        </div>
-        <!-- 들판 그룹 -->
-        <div class="category-section" data-cat="field">
-            <div class="category-header">
-                <h3>🌾 들판 그룹</h3>
-                <span class="tip">연속된 노랑토큰이 2개 이상 들판 1곳마다 5점</span>
-            </div>
-            <div class="player-list"></div>
-        </div>
-        <!-- 물 그룹 -->
-        <div class="category-section" data-cat="water">
-            <div class="category-header">
-                <h3>💧 물 그룹</h3>
-                <span class="tip">A면 강길이의 따라 점수 B면 각 섬마다 점수</span>
-            </div>
-            <div class="player-list"></div>
-        </div>
-        <!-- 건물 그룹 -->
-        <div class="category-section" data-cat="building">
-            <div class="category-header">
-                <h3>🏠 건물 그룹</h3>
-                <span class="tip">각 건물마다 5점</span>
-            </div>
-            <div class="player-list"></div>
-        </div>
-        <!-- 동물 그룹 -->
-        <div class="category-section" data-cat="animal">
-            <div class="category-header">
-                <h3>🐾 동물 그룹</h3>
-                <span class="tip">카드 조건에 맞추기</span>
-            </div>
-            <div class="player-list"></div>
-        </div>
-        <!-- 정령(확장) 그룹 -->
-        <div class="category-section" data-cat="spirit">
-            <div class="category-header">
-                <h3>✨ 정령(확장) 그룹</h3>
-                <span class="tip">확장 규칙 득점</span>
-            </div>
-            <div class="player-list"></div>
-        </div>
-    </div>
+    <!-- 플레이어 카드들이 렌더링되는 영역 -->
+    <div id="playersContainer"></div>
 
-    <button onclick="calculateResults()">결과 및 순위 보기</button>
+    <button class="action-btn" onclick="calculateResults()">결과 및 순위 보기</button>
     <div id="totalResults" class="total-section" style="display:none;"></div>
 </div>
+
 <div class="footer">제작자: 천상민</div>
 
 <script>
     let players = [];
-    const categories = ['tree', 'mountain', 'field', 'water', 'building', 'animal', 'spirit'];
+    
+    // 카테고리 정의 (키, 표시 이름, 팁/설명)
+    const categories = [
+        { key: 'tree', name: '🌲 나무', tip: '높이에 따른 점수' },
+        { key: 'mountain', name: '⛰️ 산', tip: '인접 산 높이 점수' },
+        { key: 'field', name: '🌾 들판', tip: '노랑토큰 2개이상 (곳당 5점)' },
+        { key: 'water', name: '💧 물', tip: 'A강길 / B섬 점수' },
+        { key: 'building', name: '🏠 건물', tip: '각 건물당 5점' },
+        { key: 'animal', name: '🐾 동물', tip: '카드 조건 맞춤 점수' },
+        { key: 'spirit', name: '✨ 정령(확장)', tip: '확장 규칙 점수' }
+    ];
 
-    // 페이지 로드 시 저장된 데이터 불러오기
     window.onload = function() {
-        let savedData = localStorage.getItem('harmonies_players');
+        let savedData = localStorage.getItem('harmonies_players_mobile');
         if (savedData) {
             try {
                 players = JSON.parse(savedData);
@@ -123,44 +205,56 @@
             } catch(e) {
                 players = [];
             }
+        } else {
+            // 기존 데이터 호환을 위해 기존 키 확인 후 마이그레이션 시도 또는 빈 상태 시작
+            let oldData = localStorage.getItem('harmonies_players');
+            if (oldData) {
+                try {
+                    players = JSON.parse(oldData);
+                    render();
+                } catch(e) {
+                    players = [];
+                }
+            }
         }
     };
 
     function saveData() {
-        localStorage.setItem('harmonies_players', JSON.stringify(players));
+        localStorage.setItem('harmonies_players_mobile', JSON.stringify(players));
     }
 
     function addPlayer() {
         let pid = Date.now();
         let defaultName = "플레이어 " + (players.length + 1);
-        players.push({ pid: pid, name: defaultName, scores: { tree: '', mountain: '', field: '', water: '', building: '', animal: '', spirit: '' } });
+        let initialScores = {};
+        categories.forEach(cat => { initialScores[cat.key] = ''; });
+        
+        players.push({ pid: pid, name: defaultName, scores: initialScores });
         render();
         saveData();
     }
 
     function removePlayer(pid) {
-        players = players.filter(p => p.pid !== pid);
-        render();
-        saveData();
+        if (confirm("이 플레이어를 삭제하시겠습니까?")) {
+            players = players.filter(p => p.pid !== pid);
+            render();
+            saveData();
+            document.getElementById('totalResults').style.display = "none";
+        }
     }
 
     function updatePlayerName(pid, newName) {
         let player = players.find(p => p.pid === pid);
         if (player) {
             player.name = newName;
-            document.querySelectorAll(`.name-input-${pid}`).forEach(input => {
-                if (input.value !== newName) {
-                    input.value = newName;
-                }
-            });
             saveData();
         }
     }
 
-    function updateScore(pid, cat, val) {
+    function updateScore(pid, catKey, val) {
         let player = players.find(p => p.pid === pid);
         if (player) {
-            player.scores[cat] = val;
+            player.scores[catKey] = val;
             saveData();
         }
     }
@@ -168,6 +262,7 @@
     function resetData() {
         if (confirm("모든 플레이어와 점수 기록을 초기화하시겠습니까?")) {
             players = [];
+            localStorage.removeItem('harmonies_players_mobile');
             localStorage.removeItem('harmonies_players');
             render();
             document.getElementById('totalResults').style.display = "none";
@@ -175,47 +270,72 @@
     }
 
     function render() {
-        categories.forEach(cat => {
-            let section = document.querySelector(`[data-cat="${cat}"] .player-list`);
-            let html = "";
-            players.forEach(p => {
-                let currentVal = p.scores[cat] !== undefined ? p.scores[cat] : '';
-                html += `<div class="player-row">
-                    <input type="text" class="name-input name-input-${p.pid}" value="${p.name}" oninput="updatePlayerName(${p.pid}, this.value)">
-                    <input type="number" class="score-input" placeholder="점수" value="${currentVal}" oninput="updateScore(${p.pid}, '${cat}', this.value)">
+        let container = document.getElementById('playersContainer');
+        if (players.length === 0) {
+            container.innerHTML = `<div class="empty-notice">상단의 <strong>'+ 플레이어 추가'</strong> 버튼을 눌러 게임을 시작하세요!</div>`;
+            return;
+        }
+
+        let html = "";
+        players.forEach((p, idx) => {
+            html += `
+            <div class="player-card">
+                <div class="player-card-header">
+                    <input type="text" class="name-input" value="${p.name}" placeholder="플레이어 이름" oninput="updatePlayerName(${p.pid}, this.value)">
                     <button class="del-btn" onclick="removePlayer(${p.pid})">삭제</button>
-                </div>`;
+                </div>
+                <div class="score-grid">
+            `;
+
+            categories.forEach(cat => {
+                let currentVal = (p.scores && p.scores[cat.key] !== undefined) ? p.scores[cat.key] : '';
+                html += `
+                    <div class="score-item">
+                        <label>${cat.name} <span>${cat.tip}</span></label>
+                        <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${currentVal}" oninput="updateScore(${p.pid}, '${cat.key}', this.value)">
+                    </div>
+                `;
             });
-            section.innerHTML = html;
+
+            html += `
+                </div>
+            </div>
+            `;
         });
+        container.innerHTML = html;
     }
 
     function calculateResults() {
+        if (players.length === 0) {
+            alert("등록된 플레이어가 없습니다.");
+            return;
+        }
+
         let results = players.map(p => {
             let totalScore = 0;
             categories.forEach(cat => {
-                let val = parseInt(p.scores[cat]) || 0;
+                let val = parseInt(p.scores[cat.key]) || 0;
                 totalScore += val;
             });
-            return { name: p.name, score: totalScore };
+            return { name: p.name || '이름 없음', score: totalScore };
         }).sort((a, b) => b.score - a.score);
 
         let resDiv = document.getElementById('totalResults');
         resDiv.style.display = "block";
         
         let html = "<h3>🏆 최종 순위</h3>";
-        if (results.length === 0) {
-            html += "<p>등록된 플레이어가 없습니다.</p>";
-        } else {
-            let currentRank = 1;
-            results.forEach((r, idx) => {
-                if (idx > 0 && results[idx - 1].score !== r.score) {
-                    currentRank = idx + 1;
-                }
-                html += `<div class="rank-item"><span>${currentRank}등: ${r.name}</span> <span>${r.score}점</span></div>`;
-            });
-        }
+        let currentRank = 1;
+        results.forEach((r, idx) => {
+            if (idx > 0 && results[idx - 1].score !== r.score) {
+                currentRank = idx + 1;
+            }
+            let medal = currentRank === 1 ? '🥇' : (currentRank === 2 ? '🥈' : (currentRank === 3 ? '🥉' : ''));
+            html += `<div class="rank-item"><span>${medal} ${currentRank}등: ${r.name}</span> <span>${r.score}점</span></div>`;
+        });
         resDiv.innerHTML = html;
+        
+        // 결과 보기 누를 때 결과창으로 부드럽게 스크롤
+        resDiv.scrollIntoView({ behavior: 'smooth' });
     }
 </script>
 </body>
