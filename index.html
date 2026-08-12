@@ -283,7 +283,8 @@
         { key: 'field', name: '🌾 들판 그룹', tip: '노랑토큰 2개 이상 (곳당 5점)' },
         { key: 'water', name: '💧 물 그룹', tip: 'A강길 / B섬 선택 입력' },
         { key: 'building', name: '🏠 건물 그룹', tip: '건물당 5점' },
-        { key: 'animal', name: '🐾 동물 그룹', tip: '카드 조건 점수 직접 입력' }
+        { key: 'animal', name: '🐾 동물 그룹', tip: '카드 조건 점수 직접 입력' },
+        { key: 'spirit', name: '✨ 정령 카드 (확장)', tip: '카드 장당 1점' }
     ];
 
     window.onload = function() {
@@ -318,7 +319,8 @@
             waterLines: '',
             waterIsland: '',
             building: '',
-            animal: ''
+            animal: '',
+            spirit: ''
         };
         
         players.push({ pid: pid, name: name, scores: initialScores });
@@ -358,7 +360,12 @@
         if (player) {
             player.scores.waterMode = mode;
             saveData();
-            render(); 
+            let container = document.getElementById(`water-inputs-${pid}`);
+            if (container) {
+                container.innerHTML = getWaterInputsHtml(player);
+            }
+            updatePreview(pid, 'water');
+            updateResults();
         }
     }
 
@@ -406,6 +413,8 @@
             total += (parseInt(s.building) || 0) * 5;
         } else if (catKey === 'animal') {
             total += (parseInt(s.animal) || 0);
+        } else if (catKey === 'spirit') {
+            total += (parseInt(s.spirit) || 0) * 1;
         }
 
         return total;
@@ -413,12 +422,9 @@
 
     function calculatePlayerScore(p) {
         let total = 0;
-        total += calculateCategoryScore(p, 'tree');
-        total += calculateCategoryScore(p, 'mountain');
-        total += calculateCategoryScore(p, 'field');
-        total += calculateCategoryScore(p, 'water');
-        total += calculateCategoryScore(p, 'building');
-        total += calculateCategoryScore(p, 'animal');
+        categories.forEach(cat => {
+            total += calculateCategoryScore(p, cat.key);
+        });
         return total;
     }
 
@@ -439,6 +445,40 @@
             localStorage.removeItem('harmonies_rule_calc');
             render();
         }
+    }
+
+    function getWaterInputsHtml(p) {
+        let isA = p.scores.waterMode === 'A';
+        let html = `
+        <div class="mode-selector">
+            <label class="${isA ? 'active' : ''}" onclick="updateWaterMode(${p.pid}, 'A')">
+                <input type="radio" name="waterMode-${p.pid}" ${isA ? 'checked' : ''}> A (강길 점수)
+            </label>
+            <label class="${!isA ? 'active' : ''}" onclick="updateWaterMode(${p.pid}, 'B')">
+                <input type="radio" name="waterMode-${p.pid}" ${!isA ? 'checked' : ''}> B (섬 점수)
+            </label>
+        </div>
+        `;
+        if (isA) {
+            html += `
+            <div class="input-grid">
+                <div class="input-group" style="grid-column: span 2;">
+                    <label>완성한 강길 총 줄 수</label>
+                    <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.waterLines}" oninput="updateDirectScore(${p.pid}, 'waterLines', this.value)">
+                </div>
+            </div>
+            `;
+        } else {
+            html += `
+            <div class="input-grid">
+                <div class="input-group" style="grid-column: span 2;">
+                    <label>완성한 섬 개수 (개당 5점)</label>
+                    <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.waterIsland}" oninput="updateDirectScore(${p.pid}, 'waterIsland', this.value)">
+                </div>
+            </div>
+            `;
+        }
+        return html;
     }
 
     function render() {
@@ -470,6 +510,8 @@
                 catHtml += `<div class="sub-tip">규칙: 0층(0점) / 1층(1점) / 2층(3점) / 3층(7점)</div>`;
             } else if (cat.key === 'water') {
                 catHtml += `<div class="sub-tip">규칙: A(강길 점수) / B(섬 점수)</div>`;
+            } else if (cat.key === 'spirit') {
+                catHtml += `<div class="sub-tip">규칙: 정령 카드 1장당 1점</div>`;
             }
 
             catHtml += `
@@ -488,6 +530,7 @@
                             <span>👤 ${p.name}</span>
                             <span class="calc-preview" id="preview-${cat.key}-${p.pid}">현재 합계: ${currentScore}점</span>
                         </div>
+                        <div id="${cat.key === 'water' ? 'water-inputs-' + p.pid : ''}">
                     `;
 
                     if (cat.key === 'tree' || cat.key === 'mountain') {
@@ -522,36 +565,7 @@
                         </div>
                         `;
                     } else if (cat.key === 'water') {
-                        let isA = p.scores.waterMode === 'A';
-                        catHtml += `
-                        <div class="mode-selector">
-                            <label class="${isA ? 'active' : ''}" onclick="updateWaterMode(${p.pid}, 'A')">
-                                <input type="radio" name="waterMode-${p.pid}" ${isA ? 'checked' : ''}> A (강길 점수)
-                            </label>
-                            <label class="${!isA ? 'active' : ''}" onclick="updateWaterMode(${p.pid}, 'B')">
-                                <input type="radio" name="waterMode-${p.pid}" ${!isA ? 'checked' : ''}> B (섬 점수)
-                            </label>
-                        </div>
-                        `;
-                        if (isA) {
-                            catHtml += `
-                            <div class="input-grid">
-                                <div class="input-group" style="grid-column: span 2;">
-                                    <label>완성한 강길 총 줄 수</label>
-                                    <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.waterLines}" oninput="updateDirectScore(${p.pid}, 'waterLines', this.value)">
-                                </div>
-                            </div>
-                            `;
-                        } else {
-                            catHtml += `
-                            <div class="input-grid">
-                                <div class="input-group" style="grid-column: span 2;">
-                                    <label>완성한 섬 개수 (개당 5점)</label>
-                                    <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.waterIsland}" oninput="updateDirectScore(${p.pid}, 'waterIsland', this.value)">
-                                </div>
-                            </div>
-                            `;
-                        }
+                        catHtml += getWaterInputsHtml(p);
                     } else if (cat.key === 'building') {
                         catHtml += `
                         <div class="input-grid">
@@ -570,9 +584,18 @@
                             </div>
                         </div>
                         `;
+                    } else if (cat.key === 'spirit') {
+                        catHtml += `
+                        <div class="input-grid">
+                            <div class="input-group" style="grid-column: span 2;">
+                                <label>정령 카드 개수 (장당 1점)</label>
+                                <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.spirit}" oninput="updateDirectScore(${p.pid}, 'spirit', this.value)">
+                            </div>
+                        </div>
+                        `;
                     }
 
-                    catHtml += `</div>`;
+                    catHtml += `</div></div>`;
                 });
             }
 
