@@ -20,7 +20,8 @@
             margin: 0; 
             padding: 20px; 
             display: flex; 
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             color: var(--text-color);
         }
 
@@ -54,6 +55,12 @@
             border-radius: 15px; text-align: center; font-size: 20px; 
             font-weight: bold; color: var(--accent-green);
         }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -84,6 +91,10 @@
     <div class="result" id="res">총 점수: 0점</div>
 </div>
 
+<div class="footer">
+    제작자: 천상민
+</div>
+
 <script>
     function calc() {
         let total = 0;
@@ -95,4 +106,4 @@
 </script>
 
 </body>
-</html>
+</html
