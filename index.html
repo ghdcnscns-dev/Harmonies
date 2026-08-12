@@ -50,7 +50,7 @@
         <div class="category-section" data-cat="tree">
             <div class="category-header">
                 <h3>🌲 나무 그룹</h3>
-                <span class="tip">숲을 이루어 배치</span>
+                <span class="tip">각 나무의 높이에 따라 점수</span>
             </div>
             <div class="player-list"></div>
         </div>
@@ -58,7 +58,7 @@
         <div class="category-section" data-cat="mountain">
             <div class="category-header">
                 <h3>⛰️ 산 그룹</h3>
-                <span class="tip">높이와 능선 연결</span>
+                <span class="tip">각 산 높이에 따라 점수 단,인접해야됨</span>
             </div>
             <div class="player-list"></div>
         </div>
@@ -66,7 +66,7 @@
         <div class="category-section" data-cat="field">
             <div class="category-header">
                 <h3>🌾 들판 그룹</h3>
-                <span class="tip">인접한 들판 확장</span>
+                <span class="tip">연속된 노랑토큰이 2개 이상 들판 1곳마다 5점</span>
             </div>
             <div class="player-list"></div>
         </div>
@@ -74,7 +74,15 @@
         <div class="category-section" data-cat="water">
             <div class="category-header">
                 <h3>💧 물 그룹</h3>
-                <span class="tip">강줄기 형태 연결</span>
+                <span class="tip">A면 강길이의 따라 점수 B면 각 섬마다 점수</span>
+            </div>
+            <div class="player-list"></div>
+        </div>
+        <!-- 건물 그룹 -->
+        <div class="category-section" data-cat="building">
+            <div class="category-header">
+                <h3>🏠 건물 그룹</h3>
+                <span class="tip">각 건물마다 5점</span>
             </div>
             <div class="player-list"></div>
         </div>
@@ -103,7 +111,7 @@
 
 <script>
     let players = [];
-    const categories = ['tree', 'mountain', 'field', 'water', 'animal', 'spirit'];
+    const categories = ['tree', 'mountain', 'field', 'water', 'building', 'animal', 'spirit'];
 
     // 페이지 로드 시 저장된 데이터 불러오기
     window.onload = function() {
@@ -119,14 +127,13 @@
     };
 
     function saveData() {
-        // 점수 입력값도 임시 객체 형태로 함께 보존하기 위해 현재 입력 상태 반영
         localStorage.setItem('harmonies_players', JSON.stringify(players));
     }
 
     function addPlayer() {
         let pid = Date.now();
         let defaultName = "플레이어 " + (players.length + 1);
-        players.push({ pid: pid, name: defaultName, scores: { tree: '', mountain: '', field: '', water: '', animal: '', spirit: '' } });
+        players.push({ pid: pid, name: defaultName, scores: { tree: '', mountain: '', field: '', water: '', building: '', animal: '', spirit: '' } });
         render();
         saveData();
     }
@@ -202,7 +209,6 @@
         } else {
             let currentRank = 1;
             results.forEach((r, idx) => {
-                // 공동 순위 처리 (이전 사람과 점수가 같으면 같은 등수 부여)
                 if (idx > 0 && results[idx - 1].score !== r.score) {
                     currentRank = idx + 1;
                 }
