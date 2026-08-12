@@ -218,21 +218,6 @@
             font-weight: bold;
         }
 
-        /* 메인 액션 버튼 */
-        .action-btn {
-            cursor: pointer; 
-            padding: 14px; 
-            border: none; 
-            border-radius: 12px; 
-            background: var(--accent-green); 
-            color: white; 
-            width: 100%; 
-            font-weight: bold;
-            font-size: 1.05em;
-            box-shadow: 0 3px 6px rgba(125, 165, 110, 0.3);
-        }
-        .action-btn:active { background: var(--accent-green-dark); }
-
         .footer { margin-top: 20px; font-size: 0.8em; color: #888; text-align: center; }
         
         .total-section { 
@@ -240,7 +225,7 @@
             padding: 15px; 
             background: #f0f4ed; 
             border-radius: 12px; 
-            border: 1px solid #d4dec9;
+            border: 1px solid #d4dec9; 
         }
         .total-section h3 { margin-top: 0; color: var(--accent-green-dark); text-align: center; }
         .rank-item { 
@@ -270,7 +255,7 @@
     <div class="manage-section">
         <div class="manage-title">👥 플레이어 관리</div>
         <div class="player-add-row">
-            <input type="text" id="newPlayerName" class="name-input" placeholder="참가자 이름 입력">
+            <input type="text" id="newPlayerName" class="name-input" placeholder="참가자 이름 입력" onkeypress="if(event.key === 'Enter') addPlayer()">
             <button class="add-btn" onclick="addPlayer()">추가</button>
         </div>
         <div id="playerTagList" class="player-tag-list"></div>
@@ -283,8 +268,8 @@
     <!-- 각 그룹별 점수 입력 섹션 -->
     <div id="categoriesContainer"></div>
 
-    <button class="action-btn" onclick="calculateResults()">결과 및 순위 보기</button>
-    <div id="totalResults" class="total-section" style="display:none;"></div>
+    <!-- 실시간 순위 섹션 -->
+    <div id="totalResults" class="total-section"></div>
 </div>
 
 <div class="footer">제작자: 천상민</div>
@@ -306,13 +291,11 @@
         if (savedData) {
             try {
                 players = JSON.parse(savedData);
-                render();
             } catch(e) {
                 players = [];
             }
-        } else {
-            render();
         }
+        render();
     };
 
     function saveData() {
@@ -348,7 +331,6 @@
         players = players.filter(p => p.pid !== pid);
         render();
         saveData();
-        document.getElementById('totalResults').style.display = "none";
     }
 
     function updateSubScore(pid, catKey, subKey, val) {
@@ -357,6 +339,7 @@
             player.scores[catKey][subKey] = val;
             saveData();
             updatePreview(pid, catKey);
+            updateResults();
         }
     }
 
@@ -366,6 +349,7 @@
             player.scores[catKey] = val;
             saveData();
             updatePreview(pid, catKey);
+            updateResults();
         }
     }
 
@@ -378,7 +362,6 @@
         }
     }
 
-    // 특정 카테고리(그룹)의 점수만 계산하는 함수
     function calculateCategoryScore(p, catKey) {
         let s = p.scores;
         let total = 0;
@@ -428,7 +411,6 @@
         return total;
     }
 
-    // 전체 점수 계산 함수 (최종 순위용)
     function calculatePlayerScore(p) {
         let total = 0;
         total += calculateCategoryScore(p, 'tree');
@@ -456,7 +438,6 @@
             players = [];
             localStorage.removeItem('harmonies_rule_calc');
             render();
-            document.getElementById('totalResults').style.display = "none";
         }
     }
 
@@ -485,12 +466,10 @@
                     </div>
             `;
             
-            if (cat.key === 'tree') {
-                catHtml += `<div class="sub-tip">규칙: 0층(0점) / 1층(1점) / 2층(3점) / 3층(7점)</div>`;
-            } else if (cat.key === 'mountain') {
+            if (cat.key === 'tree' || cat.key === 'mountain') {
                 catHtml += `<div class="sub-tip">규칙: 0층(0점) / 1층(1점) / 2층(3점) / 3층(7점)</div>`;
             } else if (cat.key === 'water') {
-                catHtml += `<div class="sub-tip">규칙: A(줄별 차등+초과시+4점) / B(섬당 5점)</div>`;
+                catHtml += `<div class="sub-tip">규칙: A(강길 점수) / B(섬 점수)</div>`;
             }
 
             catHtml += `
@@ -604,22 +583,22 @@
         });
 
         catContainer.innerHTML = catHtml;
+        updateResults();
     }
 
-    function calculateResults() {
+    function updateResults() {
+        let resDiv = document.getElementById('totalResults');
         if (players.length === 0) {
-            alert("등록된 플레이어가 없습니다.");
+            resDiv.style.display = "none";
             return;
         }
 
+        resDiv.style.display = "block";
         let results = players.map(p => {
             return { name: p.name, score: calculatePlayerScore(p) };
         }).sort((a, b) => b.score - a.score);
-
-        let resDiv = document.getElementById('totalResults');
-        resDiv.style.display = "block";
         
-        let html = "<h3>🏆 최종 순위</h3>";
+        let html = "<h3>🏆 실시간 순위</h3>";
         let currentRank = 1;
         results.forEach((r, idx) => {
             if (idx > 0 && results[idx - 1].score !== r.score) {
@@ -629,7 +608,6 @@
             html += `<div class="rank-item"><span>${medal} ${currentRank}등: ${r.name}</span> <span>${r.score}점</span></div>`;
         });
         resDiv.innerHTML = html;
-        resDiv.scrollIntoView({ behavior: 'smooth' });
     }
 </script>
 </body>
