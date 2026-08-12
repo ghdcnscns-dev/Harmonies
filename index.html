@@ -356,7 +356,7 @@
         if (player) {
             player.scores[catKey][subKey] = val;
             saveData();
-            updatePreview(pid);
+            updatePreview(pid, catKey);
         }
     }
 
@@ -365,7 +365,7 @@
         if (player) {
             player.scores[catKey] = val;
             saveData();
-            updatePreview(pid);
+            updatePreview(pid, catKey);
         }
     }
 
@@ -378,67 +378,73 @@
         }
     }
 
-    // 개별 점수 계산 로직 함수들
-    function calculatePlayerScore(p) {
+    // 특정 카테고리(그룹)의 점수만 계산하는 함수
+    function calculateCategoryScore(p, catKey) {
         let s = p.scores;
         let total = 0;
 
-        // 1. 나무 그룹 (0층:0점, 1층:1점, 2층:3점, 3층:7점)
-        if (s.tree) {
-            let t0 = parseInt(s.tree.f0) || 0;
-            let t1 = parseInt(s.tree.f1) || 0;
-            let t2 = parseInt(s.tree.f2) || 0;
-            let t3 = parseInt(s.tree.f3) || 0;
-            total += (t0 * 0) + (t1 * 1) + (t2 * 3) + (t3 * 7);
-        }
-
-        // 2. 산 그룹 (0층:0점, 1층:1점, 2층:3점, 3층:7점)
-        if (s.mountain) {
-            let m0 = parseInt(s.mountain.f0) || 0;
-            let m1 = parseInt(s.mountain.f1) || 0;
-            let m2 = parseInt(s.mountain.f2) || 0;
-            let m3 = parseInt(s.mountain.f3) || 0;
-            total += (m0 * 0) + (m1 * 1) + (m2 * 3) + (m3 * 7);
-        }
-
-        // 3. 들판 그룹 (1개당 5점)
-        total += (parseInt(s.field) || 0) * 5;
-
-        // 4. 물 그룹
-        if (s.waterMode === 'A') {
-            // A강길 규칙: 1줄당 0점, 2줄당 2점, 3줄당 5점, 4줄당 8점, 5줄당 11점, 6줄당 15점, 7줄 이상은 15점 + 줄당 +4점
-            let lines = parseInt(s.waterLines) || 0;
-            let wScore = 0;
-            if (lines === 1) wScore = 0;
-            else if (lines === 2) wScore = 2;
-            else if (lines === 3) wScore = 5;
-            else if (lines === 4) wScore = 8;
-            else if (lines === 5) wScore = 11;
-            else if (lines === 6) wScore = 15;
-            else if (lines >= 7) {
-                wScore = 15 + (lines - 6) * 4;
+        if (catKey === 'tree') {
+            if (s.tree) {
+                let t0 = parseInt(s.tree.f0) || 0;
+                let t1 = parseInt(s.tree.f1) || 0;
+                let t2 = parseInt(s.tree.f2) || 0;
+                let t3 = parseInt(s.tree.f3) || 0;
+                total += (t0 * 0) + (t1 * 1) + (t2 * 3) + (t3 * 7);
             }
-            total += wScore;
-        } else {
-            // B섬 규칙: 1개의 섬 1개당 5점
-            let island = parseInt(s.waterIsland) || 0;
-            total += island * 5;
+        } else if (catKey === 'mountain') {
+            if (s.mountain) {
+                let m0 = parseInt(s.mountain.f0) || 0;
+                let m1 = parseInt(s.mountain.f1) || 0;
+                let m2 = parseInt(s.mountain.f2) || 0;
+                let m3 = parseInt(s.mountain.f3) || 0;
+                total += (m0 * 0) + (m1 * 1) + (m2 * 3) + (m3 * 7);
+            }
+        } else if (catKey === 'field') {
+            total += (parseInt(s.field) || 0) * 5;
+        } else if (catKey === 'water') {
+            if (s.waterMode === 'A') {
+                let lines = parseInt(s.waterLines) || 0;
+                let wScore = 0;
+                if (lines === 1) wScore = 0;
+                else if (lines === 2) wScore = 2;
+                else if (lines === 3) wScore = 5;
+                else if (lines === 4) wScore = 8;
+                else if (lines === 5) wScore = 11;
+                else if (lines === 6) wScore = 15;
+                else if (lines >= 7) {
+                    wScore = 15 + (lines - 6) * 4;
+                }
+                total += wScore;
+            } else {
+                let island = parseInt(s.waterIsland) || 0;
+                total += island * 5;
+            }
+        } else if (catKey === 'building') {
+            total += (parseInt(s.building) || 0) * 5;
+        } else if (catKey === 'animal') {
+            total += (parseInt(s.animal) || 0);
         }
-
-        // 5. 건물 그룹 (1개의 건물마다 5점)
-        total += (parseInt(s.building) || 0) * 5;
-
-        // 6. 동물 카드 점수 (직접 입력)
-        total += (parseInt(s.animal) || 0);
 
         return total;
     }
 
-    function updatePreview(pid) {
+    // 전체 점수 계산 함수 (최종 순위용)
+    function calculatePlayerScore(p) {
+        let total = 0;
+        total += calculateCategoryScore(p, 'tree');
+        total += calculateCategoryScore(p, 'mountain');
+        total += calculateCategoryScore(p, 'field');
+        total += calculateCategoryScore(p, 'water');
+        total += calculateCategoryScore(p, 'building');
+        total += calculateCategoryScore(p, 'animal');
+        return total;
+    }
+
+    function updatePreview(pid, catKey) {
         let player = players.find(p => p.pid === pid);
         if (player) {
-            let score = calculatePlayerScore(player);
-            let prevEl = document.getElementById('preview-' + pid);
+            let score = calculateCategoryScore(player, catKey);
+            let prevEl = document.getElementById(`preview-${catKey}-${pid}`);
             if (prevEl) {
                 prevEl.innerText = `현재 합계: ${score}점`;
             }
@@ -498,12 +504,12 @@
                 catHtml += `<div class="empty-notice">플레이어를 먼저 추가해주세요.</div>`;
             } else {
                 players.forEach(p => {
-                    let currentScore = calculatePlayerScore(p);
+                    let currentScore = calculateCategoryScore(p, cat.key);
                     catHtml += `
                     <div class="player-card">
                         <div class="player-card-header">
                             <span>👤 ${p.name}</span>
-                            <span class="calc-preview" id="preview-${p.pid}">현재 합계: ${currentScore}점</span>
+                            <span class="calc-preview" id="preview-${cat.key}-${p.pid}">현재 합계: ${currentScore}점</span>
                         </div>
                     `;
 
