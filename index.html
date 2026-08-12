@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>하모니즈 점수 계산기 (모바일 최적화판)</title>
+    <title>하모니즈 점수 계산기</title>
     <style>
         :root {
             --bg-color: #fdfaf0;
@@ -43,80 +43,115 @@
             padding: 12px; 
             font-size: 0.95em;
             border-radius: 10px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
         }
         .top-btns .reset-btn { background-color: #d9534f; }
         
-        /* 탭 스타일 추가 (모바일에서 한눈에 보기 편하도록 카테고리별 전환 또는 아코디언/플레이어 중심 카드 뷰) */
-        .player-card {
-            border: 2px solid var(--border-color);
-            background: #fffdfa;
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        /* 그룹(카테고리)별 섹션 디자인 */
+        .category-section { 
+            border: 2px solid var(--border-color); 
+            padding: 12px; 
+            margin-bottom: 15px; 
+            border-radius: 14px; 
+            background: #fffcf5; 
         }
-        .player-card-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
+        .category-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            padding-bottom: 6px;
             border-bottom: 1px dashed var(--border-color);
+        }
+        .category-header h3 { margin: 0; color: var(--accent-green-dark); font-size: 1.05em; }
+        .tip { font-size: 0.75em; color: #777; background: #f0f4ed; padding: 3px 6px; border-radius: 6px; }
+        
+        /* 그룹 내 플레이어 점수 입력 행 */
+        .player-row { 
+            background: #fffdfa; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 6px 8px;
+            margin-bottom: 6px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        .player-name-label {
+            flex: 1;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--text-color);
+            padding-left: 4px;
+        }
+        .score-input { 
+            width: 75px; 
+            padding: 8px; 
+            text-align: center; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            font-size: 1.05em;
+            font-weight: bold;
+            background: #fff;
+        }
+
+        /* 플레이어 관리 영역 (이름 추가/삭제) */
+        .manage-section {
+            border: 2px dashed var(--border-color);
+            padding: 12px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            background: #fcf9f2;
+        }
+        .manage-title {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: var(--accent-green-dark);
+            margin-bottom: 8px;
+        }
+        .player-add-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .name-input {
             flex: 1;
             padding: 8px 10px;
             border: 1px solid #ccc;
             border-radius: 8px;
-            font-size: 1em;
-            font-weight: bold;
-            color: var(--text-color);
+            font-size: 0.95em;
         }
-        .del-btn { 
-            background: #d9534f; 
-            width: auto; 
-            padding: 8px 12px; 
-            margin-top: 0;
+        .add-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 8px 14px;
             border-radius: 8px;
-            font-size: 0.85em;
-        }
-
-        /* 점수 입력 그리드 레이아웃 (모바일 터치 편의성 극대화) */
-        .score-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-        .score-item {
-            background: #f8faf5;
-            border: 1px solid #e2ebd8;
-            padding: 8px 10px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .score-item label {
-            font-size: 0.8em;
             font-weight: bold;
-            color: var(--accent-green-dark);
+            cursor: pointer;
+        }
+        .player-tag-list {
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 6px;
         }
-        .score-item label span {
-            font-size: 0.75em;
-            color: #888;
-            font-weight: normal;
-        }
-        .score-input {
-            width: 100%;
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: bold;
+        .player-tag {
             background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tag-del {
+            color: #d9534f;
+            cursor: pointer;
+            font-weight: bold;
         }
 
         /* 메인 액션 버튼 */
@@ -128,7 +163,6 @@
             background: var(--accent-green); 
             color: white; 
             width: 100%; 
-            margin-top: 10px; 
             font-weight: bold;
             font-size: 1.05em;
             box-shadow: 0 3px 6px rgba(125, 165, 110, 0.3);
@@ -158,8 +192,8 @@
         .empty-notice {
             text-align: center;
             color: #888;
-            padding: 20px;
-            font-size: 0.9em;
+            padding: 10px;
+            font-size: 0.85em;
         }
     </style>
 </head>
@@ -168,13 +202,22 @@
 <div class="container">
     <h2>하모니즈 점수 계산기</h2>
     
+    <!-- 플레이어 관리 박스 -->
+    <div class="manage-section">
+        <div class="manage-title">👥 플레이어 관리</div>
+        <div class="player-add-row">
+            <input type="text" id="newPlayerName" class="name-input" placeholder="참가자 이름 입력">
+            <button class="add-btn" onclick="addPlayer()">추가</button>
+        </div>
+        <div id="playerTagList" class="player-tag-list"></div>
+    </div>
+
     <div class="top-btns">
-        <button onclick="addPlayer()">+ 플레이어 추가</button>
         <button class="reset-btn" onclick="resetData()">전체 초기화</button>
     </div>
 
-    <!-- 플레이어 카드들이 렌더링되는 영역 -->
-    <div id="playersContainer"></div>
+    <!-- 각 그룹별 점수 입력 섹션 -->
+    <div id="categoriesContainer"></div>
 
     <button class="action-btn" onclick="calculateResults()">결과 및 순위 보기</button>
     <div id="totalResults" class="total-section" style="display:none;"></div>
@@ -185,19 +228,18 @@
 <script>
     let players = [];
     
-    // 카테고리 정의 (키, 표시 이름, 팁/설명)
     const categories = [
-        { key: 'tree', name: '🌲 나무', tip: '높이에 따른 점수' },
-        { key: 'mountain', name: '⛰️ 산', tip: '인접 산 높이 점수' },
-        { key: 'field', name: '🌾 들판', tip: '노랑토큰 2개이상 (곳당 5점)' },
-        { key: 'water', name: '💧 물', tip: 'A강길 / B섬 점수' },
-        { key: 'building', name: '🏠 건물', tip: '각 건물당 5점' },
-        { key: 'animal', name: '🐾 동물', tip: '카드 조건 맞춤 점수' },
-        { key: 'spirit', name: '✨ 정령(확장)', tip: '확장 규칙 점수' }
+        { key: 'tree', name: '🌲 나무 그룹', tip: '높이에 따른 점수' },
+        { key: 'mountain', name: '⛰️ 산 그룹', tip: '인접 산 높이 점수' },
+        { key: 'field', name: '🌾 들판 그룹', tip: '노랑토큰 2개이상 (곳당 5점)' },
+        { key: 'water', name: '💧 물 그룹', tip: 'A강길 / B섬 점수' },
+        { key: 'building', name: '🏠 건물 그룹', tip: '각 건물당 5점' },
+        { key: 'animal', name: '🐾 동물 그룹', tip: '카드 조건 맞춤 점수' },
+        { key: 'spirit', name: '✨ 정령(확장) 그룹', tip: '확장 규칙 점수' }
     ];
 
     window.onload = function() {
-        let savedData = localStorage.getItem('harmonies_players_mobile');
+        let savedData = localStorage.getItem('harmonies_group_calc');
         if (savedData) {
             try {
                 players = JSON.parse(savedData);
@@ -206,49 +248,36 @@
                 players = [];
             }
         } else {
-            // 기존 데이터 호환을 위해 기존 키 확인 후 마이그레이션 시도 또는 빈 상태 시작
-            let oldData = localStorage.getItem('harmonies_players');
-            if (oldData) {
-                try {
-                    players = JSON.parse(oldData);
-                    render();
-                } catch(e) {
-                    players = [];
-                }
-            }
+            render();
         }
     };
 
     function saveData() {
-        localStorage.setItem('harmonies_players_mobile', JSON.stringify(players));
+        localStorage.setItem('harmonies_group_calc', JSON.stringify(players));
     }
 
     function addPlayer() {
-        let pid = Date.now();
-        let defaultName = "플레이어 " + (players.length + 1);
+        let input = document.getElementById('newPlayerName');
+        let name = input.value.trim();
+        if (!name) {
+            name = "플레이어 " + (players.length + 1);
+        }
+        
+        let pid = Date.now() + Math.random();
         let initialScores = {};
         categories.forEach(cat => { initialScores[cat.key] = ''; });
         
-        players.push({ pid: pid, name: defaultName, scores: initialScores });
+        players.push({ pid: pid, name: name, scores: initialScores });
+        input.value = '';
         render();
         saveData();
     }
 
     function removePlayer(pid) {
-        if (confirm("이 플레이어를 삭제하시겠습니까?")) {
-            players = players.filter(p => p.pid !== pid);
-            render();
-            saveData();
-            document.getElementById('totalResults').style.display = "none";
-        }
-    }
-
-    function updatePlayerName(pid, newName) {
-        let player = players.find(p => p.pid === pid);
-        if (player) {
-            player.name = newName;
-            saveData();
-        }
+        players = players.filter(p => p.pid !== pid);
+        render();
+        saveData();
+        document.getElementById('totalResults').style.display = "none";
     }
 
     function updateScore(pid, catKey, val) {
@@ -262,47 +291,60 @@
     function resetData() {
         if (confirm("모든 플레이어와 점수 기록을 초기화하시겠습니까?")) {
             players = [];
-            localStorage.removeItem('harmonies_players_mobile');
-            localStorage.removeItem('harmonies_players');
+            localStorage.removeItem('harmonies_group_calc');
             render();
             document.getElementById('totalResults').style.display = "none";
         }
     }
 
     function render() {
-        let container = document.getElementById('playersContainer');
+        // 1. 플레이어 태그 목록 렌더링
+        let tagContainer = document.getElementById('playerTagList');
         if (players.length === 0) {
-            container.innerHTML = `<div class="empty-notice">상단의 <strong>'+ 플레이어 추가'</strong> 버튼을 눌러 게임을 시작하세요!</div>`;
-            return;
+            tagContainer.innerHTML = `<div class="empty-notice" style="width:100%;">등록된 플레이어가 없습니다. 위에서 이름을 추가해주세요.</div>`;
+        } else {
+            let tagHtml = "";
+            players.forEach(p => {
+                tagHtml += `<div class="player-tag">${p.name} <span class="tag-del" onclick="removePlayer(${p.pid})">×</span></div>`;
+            });
+            tagContainer.innerHTML = tagHtml;
         }
 
-        let html = "";
-        players.forEach((p, idx) => {
-            html += `
-            <div class="player-card">
-                <div class="player-card-header">
-                    <input type="text" class="name-input" value="${p.name}" placeholder="플레이어 이름" oninput="updatePlayerName(${p.pid}, this.value)">
-                    <button class="del-btn" onclick="removePlayer(${p.pid})">삭제</button>
+        // 2. 그룹(카테고리)별 점수판 렌더링
+        let catContainer = document.getElementById('categoriesContainer');
+        let catHtml = "";
+
+        categories.forEach(cat => {
+            catHtml += `
+            <div class="category-section">
+                <div class="category-header">
+                    <h3>${cat.name}</h3>
+                    <span class="tip">${cat.tip}</span>
                 </div>
-                <div class="score-grid">
+                <div class="category-player-list">
             `;
 
-            categories.forEach(cat => {
-                let currentVal = (p.scores && p.scores[cat.key] !== undefined) ? p.scores[cat.key] : '';
-                html += `
-                    <div class="score-item">
-                        <label>${cat.name} <span>${cat.tip}</span></label>
+            if (players.length === 0) {
+                catHtml += `<div class="empty-notice">플레이어를 먼저 추가해주세요.</div>`;
+            } else {
+                players.forEach(p => {
+                    let currentVal = (p.scores && p.scores[cat.key] !== undefined) ? p.scores[cat.key] : '';
+                    catHtml += `
+                    <div class="player-row">
+                        <span class="player-name-label">${p.name}</span>
                         <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${currentVal}" oninput="updateScore(${p.pid}, '${cat.key}', this.value)">
                     </div>
-                `;
-            });
+                    `;
+                });
+            }
 
-            html += `
+            catHtml += `
                 </div>
             </div>
             `;
         });
-        container.innerHTML = html;
+
+        catContainer.innerHTML = catHtml;
     }
 
     function calculateResults() {
@@ -317,7 +359,7 @@
                 let val = parseInt(p.scores[cat.key]) || 0;
                 totalScore += val;
             });
-            return { name: p.name || '이름 없음', score: totalScore };
+            return { name: p.name, score: totalScore };
         }).sort((a, b) => b.score - a.score);
 
         let resDiv = document.getElementById('totalResults');
@@ -333,8 +375,6 @@
             html += `<div class="rank-item"><span>${medal} ${currentRank}등: ${r.name}</span> <span>${r.score}점</span></div>`;
         });
         resDiv.innerHTML = html;
-        
-        // 결과 보기 누를 때 결과창으로 부드럽게 스크롤
         resDiv.scrollIntoView({ behavior: 'smooth' });
     }
 </script>
