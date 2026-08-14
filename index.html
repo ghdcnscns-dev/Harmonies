@@ -50,7 +50,6 @@
             position: relative;
         }
 
-        /* 하이엔드 수공예 느낌을 주는 상단 장식 바 */
         .container::before {
             content: "";
             position: absolute;
@@ -90,7 +89,7 @@
             margin-top: 6px;
         }
 
-        /* 참가자 관리 섹션 (Pro 스타일) */
+        /* 참가자 관리 섹션 */
         .manage-section {
             background: #fbf8f2;
             border: 1px solid var(--border-line);
@@ -156,16 +155,35 @@
 
         .player-tag {
             background: #fff;
-            border: 1px solid var(--border-line);
-            padding: 8px 14px;
+            border: 1.5px solid var(--border-line);
+            padding: 6px 12px;
             border-radius: 10px;
             font-size: 0.9em;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             box-shadow: var(--shadow-card);
             color: var(--primary-forest);
+        }
+
+        .player-tag input {
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.95em;
+            color: var(--primary-forest);
+            width: 80px;
+            outline: none;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .player-tag input:focus {
+            background: #f2ede4;
+            border: 1px dashed var(--accent-gold);
         }
 
         .tag-del {
@@ -209,7 +227,7 @@
             border-color: #d9534f;
         }
 
-        /* 카테고리별 아코디언 카드 */
+        /* 카테고리별 카드 스타일 */
         .category-section { 
             border: 1px solid var(--border-line); 
             padding: 20px; 
@@ -246,6 +264,12 @@
             gap: 8px;
         }
 
+        .category-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .tip { 
             font-size: 0.75em; 
             color: var(--primary-forest); 
@@ -254,6 +278,24 @@
             border-radius: 6px; 
             font-weight: 600;
             border: 1px solid #ecd8b4;
+        }
+
+        .cat-reset-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-line);
+            padding: 4px 10px;
+            font-size: 0.75em;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .cat-reset-btn:hover {
+            background: #fdf7f7;
+            color: #d9534f;
+            border-color: #d9534f;
         }
         
         .sub-tip {
@@ -294,7 +336,6 @@
             border: 1px solid #ecd8b4;
         }
 
-        /* 인풋 그리드 */
         .input-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -346,7 +387,6 @@
             box-shadow: 0 0 0 2px rgba(43, 63, 39, 0.08);
         }
 
-        /* 물 그룹 A/B 모드 셀렉터 스위치 */
         .mode-selector {
             display: flex;
             gap: 8px;
@@ -376,7 +416,7 @@
             box-shadow: 0 2px 6px rgba(194, 142, 56, 0.15);
         }
 
-        /* 최종 순위 섹션 (하이엔드 리포트 풍) */
+        /* 최종 순위 섹션 */
         .total-section { 
             margin-top: 30px; 
             padding: 24px; 
@@ -458,7 +498,7 @@
 <div class="container">
     <div class="header-brand">
         <div class="sub-title">Official Master Suite</div>
-        <h2>하모니즈 프로 점수 계산기</h2>
+        <h2>하모니즈 자동 점수 계산기</h2>
         <div class="header-desc">보드게임 전문 통계 및 득점 산출 솔루션</div>
     </div>
     
@@ -466,7 +506,7 @@
     <div class="manage-section">
         <div class="manage-title">👥 참가자 엔트리 관리</div>
         <div class="player-add-row">
-            <input type="text" id="newPlayerName" class="name-input" placeholder="참가자 성함 또는 닉네임 입력" onkeypress="if(event.key === 'Enter') addPlayer()">
+            <input type="text" id="newPlayerName" class="name-input" placeholder="참가자 닉네임 입력" onkeypress="if(event.key === 'Enter') addPlayer()">
             <button class="add-btn" onclick="addPlayer()">참가 등록</button>
         </div>
         <div id="playerTagList" class="player-tag-list"></div>
@@ -495,7 +535,7 @@
         { key: 'water', name: '💧 물 그룹', tip: 'A강길 / B섬 모드 선택' },
         { key: 'building', name: '🏠 건물 그룹', tip: '건물당 5점 산출' },
         { key: 'animal', name: '🐾 동물 카드', tip: '조건 달성 합산 점수' },
-        { key: 'spirit', name: '✨ 정령 카드 (확장)', tip: '달성 카드 장수 입력' }
+        { key: 'spirit', name: '✨ 정령 카드 (확장)', tip: '조건 달성 합산 점수' }
     ];
 
     window.onload = function() {
@@ -531,6 +571,30 @@
     function removePlayer(pid) {
         players = players.filter(p => p.pid !== pid);
         render();
+    }
+
+    function updatePlayerName(pid, newName) {
+        let player = players.find(p => p.pid === pid);
+        if (player) {
+            player.name = newName.trim() || "무명";
+            updateResults();
+        }
+    }
+
+    function resetCategory(catKey) {
+        if (confirm(`"${categories.find(c => c.key === catKey).name}" 부문의 모든 기록을 초기화하시겠습니까?`)) {
+            players.forEach(p => {
+                if (catKey === 'tree' || catKey === 'mountain') {
+                    p.scores[catKey] = { f0: '', f1: '', f2: '', f3: '' };
+                } else if (catKey === 'water') {
+                    p.scores.waterLines = '';
+                    p.scores.waterIsland = '';
+                } else {
+                    p.scores[catKey] = '';
+                }
+            });
+            render();
+        }
     }
 
     function updateSubScore(pid, catKey, subKey, val) {
@@ -675,7 +739,12 @@
         } else {
             let tagHtml = "";
             players.forEach(p => {
-                tagHtml += `<div class="player-tag">👤 ${p.name} <span class="tag-del" onclick="removePlayer(${p.pid})" title="삭제">×</span></div>`;
+                tagHtml += `
+                <div class="player-tag">
+                    <span>👤</span>
+                    <input type="text" value="${p.name}" oninput="updatePlayerName(${p.pid}, this.value)" title="클릭하여 이름 수정">
+                    <span class="tag-del" onclick="removePlayer(${p.pid})" title="삭제">×</span>
+                </div>`;
             });
             tagContainer.innerHTML = tagHtml;
         }
@@ -689,7 +758,10 @@
                 <div class="category-header">
                     <div class="category-header-top">
                         <h3>${cat.name}</h3>
-                        <span class="tip">${cat.tip}</span>
+                        <div class="category-actions">
+                            <span class="tip">${cat.tip}</span>
+                            <button class="cat-reset-btn" onclick="resetCategory('${cat.key}')">그룹 초기화</button>
+                        </div>
                     </div>
             `;
             
@@ -698,7 +770,7 @@
             } else if (cat.key === 'water') {
                 catHtml += `<div class="sub-tip">규칙 체계: 강길(연속 길 비례 누진 환산) 또는 섬(개당 5점) 선택 적용</div>`;
             } else if (cat.key === 'spirit') {
-                catHtml += `<div class="sub-tip">규칙 체계: 확장 정령 카드 목표 달성 장수 입력</div>`;
+                catHtml += `<div class="sub-tip">규칙 체계: 확장 정령 카드 조건달성</div>`;
             }
 
             catHtml += `
@@ -775,7 +847,7 @@
                         catHtml += `
                         <div class="input-grid">
                             <div class="input-group" style="grid-column: span 2;">
-                                <label>달성한 정령 카드 장수 (장당 1점)</label>
+                                <label>정령카드 조건 달성</label>
                                 <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.spirit}" oninput="updateDirectScore(${p.pid}, 'spirit', this.value)">
                             </div>
                         </div>
@@ -808,7 +880,7 @@
             return { name: p.name, score: calculatePlayerScore(p) };
         }).sort((a, b) => b.score - a.score);
         
-        let html = "<h3>🏆 실시간 마스터 최종 순위 리포트</h3>";
+        let html = "<h3>🏆 실시간  최종 순위</h3>";
         let currentRank = 1;
         results.forEach((r, idx) => {
             if (idx > 0 && results[idx - 1].score !== r.score) {
