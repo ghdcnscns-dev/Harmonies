@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>하모니즈 공식 프로 점수 계산기 | Harmonies Pro Master Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>하모니즈 자동 점수 계산기 | Harmonies Pro Master Suite</title>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,20 +17,20 @@
             --text-muted: #7a6e61;
             --border-line: #e3d7c6;
             --card-bg: #ffffff;
-            --shadow-subtle: 0 12px 40px rgba(43, 63, 39, 0.08);
-            --shadow-card: 0 4px 16px rgba(44, 37, 32, 0.04);
-            --radius-main: 24px;
-            --radius-card: 16px;
+            --shadow-subtle: 0 8px 24px rgba(43, 63, 39, 0.06);
+            --shadow-card: 0 2px 8px rgba(44, 37, 32, 0.03);
+            --radius-main: 20px;
+            --radius-card: 14px;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; 
             background-color: var(--bg-canvas); 
             background-image: radial-gradient(#d4c7b0 0.8px, transparent 0.8px);
             background-size: 28px 28px;
-            padding: 30px 16px; 
+            padding: 12px 8px; 
             margin: 0;
             display: flex; 
             flex-direction: column; 
@@ -41,7 +41,7 @@
 
         .container { 
             background: var(--container-bg); 
-            padding: 36px 30px; 
+            padding: 20px 14px; 
             border-radius: var(--radius-main); 
             box-shadow: var(--shadow-subtle); 
             width: 100%; 
@@ -54,7 +54,7 @@
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 6px;
+            height: 5px;
             background: linear-gradient(90deg, #2b3f27, #c28e38, #2b3f27);
             border-top-left-radius: var(--radius-main);
             border-top-right-radius: var(--radius-main);
@@ -62,65 +62,65 @@
 
         .header-brand {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 20px;
         }
 
         .header-brand .sub-title {
-            font-size: 0.75em;
+            font-size: 0.7em;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: var(--accent-gold);
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         h2 { 
             margin: 0; 
             color: var(--primary-forest); 
-            font-size: 1.8em; 
+            font-size: 1.5em; 
             font-family: 'Playfair Display', serif, 'Pretendard';
             font-weight: 600;
             letter-spacing: -0.5px;
         }
 
         .header-desc {
-            font-size: 0.85em;
+            font-size: 0.8em;
             color: var(--text-muted);
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         /* 참가자 관리 섹션 */
         .manage-section {
             background: #fbf8f2;
             border: 1px solid var(--border-line);
-            padding: 20px;
+            padding: 14px;
             border-radius: var(--radius-card);
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             box-shadow: var(--shadow-card);
         }
 
         .manage-title {
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: 700;
             color: var(--primary-forest);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .player-add-row {
             display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .name-input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px 12px;
             border: 1.5px solid var(--border-line);
-            border-radius: 12px;
-            font-size: 0.95em;
+            border-radius: 10px;
+            font-size: 0.9em;
             background: #fff;
             color: var(--text-main);
             outline: none;
@@ -129,40 +129,40 @@
 
         .name-input:focus {
             border-color: var(--primary-forest);
-            box-shadow: 0 0 0 4px rgba(43, 63, 39, 0.08);
+            box-shadow: 0 0 0 3px rgba(43, 63, 39, 0.08);
         }
 
         .add-btn {
             background: var(--primary-forest);
             color: white;
             border: none;
-            padding: 0 20px;
-            border-radius: 12px;
+            padding: 0 16px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 0.95em;
+            font-size: 0.9em;
             cursor: pointer;
+            white-space: nowrap;
             transition: background 0.2s, transform 0.1s;
         }
 
-        .add-btn:hover { background: var(--primary-forest-hover); }
         .add-btn:active { transform: scale(0.97); }
 
         .player-tag-list {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
         .player-tag {
             background: #fff;
             border: 1.5px solid var(--border-line);
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 0.9em;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.85em;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             box-shadow: var(--shadow-card);
             color: var(--primary-forest);
         }
@@ -172,13 +172,12 @@
             background: transparent;
             font-family: inherit;
             font-weight: 600;
-            font-size: 0.95em;
+            font-size: 0.9em;
             color: var(--primary-forest);
-            width: 80px;
+            width: 70px;
             outline: none;
-            padding: 2px 4px;
+            padding: 2px;
             border-radius: 4px;
-            transition: background 0.2s;
         }
 
         .player-tag input:focus {
@@ -190,61 +189,48 @@
             color: #d9534f;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1.15em;
-            line-height: 1;
-            transition: opacity 0.2s;
+            font-size: 1.2em;
+            padding: 0 2px;
         }
-        .tag-del:hover { opacity: 0.7; }
 
         .empty-notice {
             text-align: center;
             color: var(--text-muted);
-            padding: 14px;
-            font-size: 0.88em;
+            padding: 10px;
+            font-size: 0.82em;
             font-style: italic;
         }
 
         .action-bar {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .reset-btn {
             background: transparent;
             color: #d9534f;
             border: 1px solid #f2dede;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 0.85em;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8em;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .reset-btn:hover {
-            background: #fdf7f7;
-            border-color: #d9534f;
         }
 
         /* 카테고리별 카드 스타일 */
         .category-section { 
             border: 1px solid var(--border-line); 
-            padding: 20px; 
-            margin-bottom: 18px; 
+            padding: 14px; 
+            margin-bottom: 14px; 
             border-radius: var(--radius-card); 
             background: var(--card-bg); 
             box-shadow: var(--shadow-card);
-            transition: border-color 0.2s;
-        }
-
-        .category-section:hover {
-            border-color: #c9b99f;
         }
 
         .category-header { 
-            margin-bottom: 16px; 
-            padding-bottom: 10px;
+            margin-bottom: 12px; 
+            padding-bottom: 8px;
             border-bottom: 1px solid #f0e9df;
         }
 
@@ -257,89 +243,87 @@
         .category-header h3 { 
             margin: 0; 
             color: var(--primary-forest); 
-            font-size: 1.15em; 
+            font-size: 1.05em; 
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .category-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .tip { 
-            font-size: 0.75em; 
+            font-size: 0.68em; 
             color: var(--primary-forest); 
             background: var(--accent-gold-light); 
-            padding: 5px 10px; 
-            border-radius: 6px; 
+            padding: 3px 6px; 
+            border-radius: 4px; 
             font-weight: 600;
             border: 1px solid #ecd8b4;
+            display: none; /* 모바일 공간 절약을 위해 작은 화면선 숨김 처리 가능, 필요시 제거 */
+        }
+
+        @media(min-width: 480px) {
+            .tip { display: inline-block; }
         }
 
         .cat-reset-btn {
             background: transparent;
             color: var(--text-muted);
             border: 1px solid var(--border-line);
-            padding: 4px 10px;
-            font-size: 0.75em;
+            padding: 3px 8px;
+            font-size: 0.7em;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .cat-reset-btn:hover {
-            background: #fdf7f7;
-            color: #d9534f;
-            border-color: #d9534f;
         }
         
         .sub-tip {
-            font-size: 0.8em;
+            font-size: 0.75em;
             color: var(--text-muted);
-            margin-top: 6px;
-            line-height: 1.4;
+            margin-top: 4px;
+            line-height: 1.3;
         }
 
         /* 플레이어별 상세 입력 카드 */
         .player-card {
             background: #faf7f2;
             border: 1px solid var(--border-line);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
         }
 
         .player-card:last-child { margin-bottom: 0; }
 
         .player-card-header {
-            font-size: 0.92em;
+            font-size: 0.85em;
             font-weight: 700;
             color: var(--primary-forest);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .calc-preview {
-            font-size: 0.9em;
+            font-size: 0.8em;
             color: var(--accent-gold);
             font-weight: 700;
             background: #fff;
-            padding: 2px 8px;
-            border-radius: 6px;
+            padding: 2px 6px;
+            border-radius: 4px;
             border: 1px solid #ecd8b4;
         }
 
         .input-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
 
         .input-grid.cols-4 {
@@ -349,62 +333,57 @@
         .input-group {
             background: #fff;
             border: 1.5px solid var(--border-line);
-            border-radius: 10px;
-            padding: 8px;
+            border-radius: 8px;
+            padding: 6px 4px;
             text-align: center;
-            transition: border-color 0.2s;
-        }
-
-        .input-group:focus-within {
-            border-color: var(--primary-forest);
         }
 
         .input-group label {
             display: block;
-            font-size: 0.75em;
+            font-size: 0.68em;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .score-input { 
             width: 100%; 
-            padding: 6px; 
+            padding: 4px; 
             text-align: center; 
             border: 1px solid transparent; 
-            border-radius: 6px; 
-            font-size: 1.05em;
+            border-radius: 4px; 
+            font-size: 1em;
             font-weight: 700;
             background: #fdfbf7;
             color: var(--text-main);
             outline: none;
-            transition: all 0.2s;
         }
 
         .score-input:focus {
             background: #fff;
             border-color: var(--primary-forest);
-            box-shadow: 0 0 0 2px rgba(43, 63, 39, 0.08);
         }
 
         .mode-selector {
             display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
 
         .mode-selector label {
             flex: 1;
             background: #fff;
             border: 1.5px solid var(--border-line);
-            padding: 10px;
+            padding: 8px 4px;
             text-align: center;
-            border-radius: 10px;
-            font-size: 0.85em;
+            border-radius: 8px;
+            font-size: 0.78em;
             cursor: pointer;
             font-weight: 700;
             color: var(--text-muted);
-            transition: all 0.2s;
         }
 
         .mode-selector input { display: none; }
@@ -413,59 +392,40 @@
             background: var(--accent-gold-light);
             border-color: var(--accent-gold);
             color: var(--primary-forest);
-            box-shadow: 0 2px 6px rgba(194, 142, 56, 0.15);
         }
 
         /* 최종 순위 섹션 */
         .total-section { 
-            margin-top: 30px; 
-            padding: 24px; 
+            margin-top: 20px; 
+            padding: 16px; 
             background: linear-gradient(135deg, #2b3f27 0%, #1e2c1b 100%);
             border-radius: var(--radius-card); 
             color: #fff;
-            box-shadow: 0 16px 36px rgba(43, 63, 39, 0.25);
+            box-shadow: 0 12px 28px rgba(43, 63, 39, 0.2);
             position: relative;
             overflow: hidden;
         }
 
-        .total-section::after {
-            content: "🏆";
-            position: absolute;
-            right: -10px;
-            bottom: -20px;
-            font-size: 100px;
-            opacity: 0.08;
-            pointer-events: none;
-        }
-
         .total-section h3 { 
-            margin: 0 0 16px 0; 
+            margin: 0 0 12px 0; 
             color: #f7f1e3; 
             text-align: center; 
             font-family: 'Playfair Display', serif, 'Pretendard';
-            font-size: 1.35em;
-            letter-spacing: 0.5px;
+            font-size: 1.2em;
             border-bottom: 1px solid rgba(255,255,255,0.15);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
         .rank-item { 
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            padding: 12px 18px; 
+            padding: 10px 12px; 
             background: rgba(255, 255, 255, 0.08);
-            margin-bottom: 8px;
-            border-radius: 12px;
+            margin-bottom: 6px;
+            border-radius: 10px;
             font-weight: 600;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(4px);
-            transition: transform 0.2s;
-        }
-
-        .rank-item:hover {
-            transform: translateX(4px);
-            background: rgba(255, 255, 255, 0.12);
         }
 
         .rank-item:last-child { margin-bottom: 0; }
@@ -473,19 +433,19 @@
         .rank-info {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.05em;
+            gap: 8px;
+            font-size: 0.95em;
         }
 
         .rank-score {
-            font-size: 1.2em;
+            font-size: 1.1em;
             color: #f2cb73;
             font-family: 'Playfair Display', serif;
         }
 
         .footer { 
-            margin-top: 30px; 
-            font-size: 0.8em; 
+            margin-top: 20px; 
+            font-size: 0.7em; 
             color: var(--text-muted); 
             text-align: center; 
             letter-spacing: 1px;
@@ -499,15 +459,15 @@
     <div class="header-brand">
         <div class="sub-title">Official Master Suite</div>
         <h2>하모니즈 자동 점수 계산기</h2>
-        <div class="header-desc">보드게임 전문 통계 및 득점 산출 솔루션</div>
+        <div class="header-desc">제작자 : 천상민</div>
     </div>
     
     <!-- 참가자 관리 섹션 -->
     <div class="manage-section">
-        <div class="manage-title">👥 참가자 엔트리 관리</div>
+        <div class="manage-title">👥 참가자 관리</div>
         <div class="player-add-row">
-            <input type="text" id="newPlayerName" class="name-input" placeholder="참가자 닉네임 입력" onkeypress="if(event.key === 'Enter') addPlayer()">
-            <button class="add-btn" onclick="addPlayer()">참가 등록</button>
+            <input type="text" id="newPlayerName" class="name-input" placeholder="닉네임 입력" onkeypress="if(event.key === 'Enter') addPlayer()">
+            <button class="add-btn" onclick="addPlayer()">등록</button>
         </div>
         <div id="playerTagList" class="player-tag-list"></div>
     </div>
@@ -523,7 +483,7 @@
     <div id="totalResults" class="total-section"></div>
 </div>
 
-<div class="footer">Harmonies Master Suite · Designed for Board Gamers</div>
+<div class="footer">Harmonies Master Suite · Mobile Optimized</div>
 
 <script>
     let players = [];
@@ -686,7 +646,7 @@
             let score = calculateCategoryScore(player, catKey);
             let prevEl = document.getElementById(`preview-${catKey}-${pid}`);
             if (prevEl) {
-                prevEl.innerText = `부문 합계: ${score}점`;
+                prevEl.innerText = `${score}점`;
             }
         }
     }
@@ -703,10 +663,10 @@
         let html = `
         <div class="mode-selector">
             <label class="${isA ? 'active' : ''}" onclick="updateWaterMode(${p.pid}, 'A')">
-                <input type="radio" name="waterMode-${p.pid}" ${isA ? 'checked' : ''}> 🌊 모드 A (강길 득점표)
+                <input type="radio" name="waterMode-${p.pid}" ${isA ? 'checked' : ''}> 🌊 모드 A (강길)
             </label>
             <label class="${!isA ? 'active' : ''}" onclick="updateWaterMode(${p.pid}, 'B')">
-                <input type="radio" name="waterMode-${p.pid}" ${!isA ? 'checked' : ''}> 🏝️ 모드 B (섬 득점)
+                <input type="radio" name="waterMode-${p.pid}" ${!isA ? 'checked' : ''}> 🏝️ 모드 B (섬)
             </label>
         </div>
         `;
@@ -760,17 +720,15 @@
                         <h3>${cat.name}</h3>
                         <div class="category-actions">
                             <span class="tip">${cat.tip}</span>
-                            <button class="cat-reset-btn" onclick="resetCategory('${cat.key}')">그룹 초기화</button>
+                            <button class="cat-reset-btn" onclick="resetCategory('${cat.key}')">초기화</button>
                         </div>
                     </div>
             `;
             
             if (cat.key === 'tree' || cat.key === 'mountain') {
-                catHtml += `<div class="sub-tip">규칙 체계: 0층(0점) / 1층(1점) / 2층(3점) / 3층(7점)</div>`;
+                catHtml += `<div class="sub-tip">규칙: 0층(0점) / 1층(1점) / 2층(3점) / 3층(7점)</div>`;
             } else if (cat.key === 'water') {
-                catHtml += `<div class="sub-tip">규칙 체계: 강길(연속 길 비례 누진 환산) 또는 섬(개당 5점) 선택 적용</div>`;
-            } else if (cat.key === 'spirit') {
-                catHtml += `<div class="sub-tip">규칙 체계: 확장 정령 카드 조건달성</div>`;
+                catHtml += `<div class="sub-tip">규칙: 강길(연속 누진 환산) 또는 섬(개당 5점) 선택</div>`;
             }
 
             catHtml += `
@@ -779,7 +737,7 @@
             `;
 
             if (players.length === 0) {
-                catHtml += `<div class="empty-notice">참가자를 등록하면 해당 부문 입력을 시작할 수 있습니다.</div>`;
+                catHtml += `<div class="empty-notice">참가자를 등록하면 입력을 시작할 수 있습니다.</div>`;
             } else {
                 players.forEach(p => {
                     let currentScore = calculateCategoryScore(p, cat.key);
@@ -787,7 +745,7 @@
                     <div class="player-card">
                         <div class="player-card-header">
                             <span>🔸 ${p.name}</span>
-                            <span class="calc-preview" id="preview-${cat.key}-${p.pid}">부문 합계: ${currentScore}점</span>
+                            <span class="calc-preview" id="preview-${cat.key}-${p.pid}">${currentScore}점</span>
                         </div>
                         <div id="${cat.key === 'water' ? 'water-inputs-' + p.pid : ''}">
                     `;
@@ -797,19 +755,19 @@
                         catHtml += `
                         <div class="input-grid cols-4">
                             <div class="input-group">
-                                <label>0층 (0점)</label>
+                                <label>0층(0)</label>
                                 <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${t.f0}" oninput="updateSubScore(${p.pid}, '${cat.key}', 'f0', this.value)">
                             </div>
                             <div class="input-group">
-                                <label>1층 (1점)</label>
+                                <label>1층(1)</label>
                                 <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${t.f1}" oninput="updateSubScore(${p.pid}, '${cat.key}', 'f1', this.value)">
                             </div>
                             <div class="input-group">
-                                <label>2층 (3점)</label>
+                                <label>2층(3)</label>
                                 <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${t.f2}" oninput="updateSubScore(${p.pid}, '${cat.key}', 'f2', this.value)">
                             </div>
                             <div class="input-group">
-                                <label>3층 (7점)</label>
+                                <label>3층(7)</label>
                                 <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${t.f3}" oninput="updateSubScore(${p.pid}, '${cat.key}', 'f3', this.value)">
                             </div>
                         </div>
@@ -818,7 +776,7 @@
                         catHtml += `
                         <div class="input-grid">
                             <div class="input-group" style="grid-column: span 2;">
-                                <label>노랑토큰 2개 이상 배치된 들판 개수 (곳당 5점)</label>
+                                <label>노랑토큰 2개 이상 들판 (곳당 5점)</label>
                                 <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.field}" oninput="updateDirectScore(${p.pid}, 'field', this.value)">
                             </div>
                         </div>
@@ -829,7 +787,7 @@
                         catHtml += `
                         <div class="input-grid">
                             <div class="input-group" style="grid-column: span 2;">
-                                <label>건물 개수 (개당 5점 환산)</label>
+                                <label>건물 개수 (개당 5점)</label>
                                 <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.building}" oninput="updateDirectScore(${p.pid}, 'building', this.value)">
                             </div>
                         </div>
@@ -847,7 +805,7 @@
                         catHtml += `
                         <div class="input-grid">
                             <div class="input-group" style="grid-column: span 2;">
-                                <label>정령카드 조건 달성</label>
+                                <label>정령카드 조건 달성 점수</label>
                                 <input type="number" pattern="[0-9]*" inputmode="numeric" class="score-input" placeholder="0" value="${p.scores.spirit}" oninput="updateDirectScore(${p.pid}, 'spirit', this.value)">
                             </div>
                         </div>
@@ -880,7 +838,7 @@
             return { name: p.name, score: calculatePlayerScore(p) };
         }).sort((a, b) => b.score - a.score);
         
-        let html = "<h3>🏆 실시간  최종 순위</h3>";
+        let html = "<h3>🏆 실시간 최종 순위</h3>";
         let currentRank = 1;
         results.forEach((r, idx) => {
             if (idx > 0 && results[idx - 1].score !== r.score) {
